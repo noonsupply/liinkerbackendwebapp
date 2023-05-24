@@ -16,6 +16,7 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  photo: String,
   created_at: { type: Date, default: Date.now },
   updated_at: { type: Date, default: Date.now },
   uniqueId: { type: String, unique: true }, //token uuid4
