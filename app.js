@@ -9,6 +9,7 @@ var indexRouter = require("./routes/index");
 var usersRouter = require("./routes/users");
 var signinRouter = require("./routes/signin");
 var signupRouter = require("./routes/signup");
+var uploadPhoto = require("./routes/uploadPhoto");
 
 var app = express();
 
@@ -22,5 +23,6 @@ app.use("/", indexRouter);
 app.use("/users", usersRouter);
 app.use("/signin", signinRouter);
 app.use("/signup", signupRouter);
+app.use("/upload", uploadPhoto);
 
 module.exports = app;
