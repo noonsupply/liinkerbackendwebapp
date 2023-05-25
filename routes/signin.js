@@ -8,11 +8,11 @@ const { ErrorMessages, HttpStatus } = require("../errors/error_messages");
 const User = require("../models/users");
 
 router.post("/login", async (req, res) => {
-  if (!checkBody(req.body, ["username", "password"])) {
+  if (!checkBody(req.body, ["email", "password"])) {
     return res.json({ result: false, error: ErrorMessages.MISSING_FIELDS });
   }
   try {
-    const data = await User.findOne({ username: req.body.username });
+    const data = await User.findOne({ email: req.body.email });
     if (data && (await bcrypt.compare(req.body.password, data.password))) {
       // Generate a JWT token for the user
       const token = jwt.sign({ userId: data._id }, process.env.JWT_SECRET, {
