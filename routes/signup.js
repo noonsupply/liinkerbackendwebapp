@@ -11,8 +11,10 @@ const User = require("../models/users");
 /* creation d'un user with JWT rte signup */
 
 router.post("/register", async (req, res) => {
-  const { username, email, password } = req.body;
-  if (!checkBody(req.body, ["username", "password", "email"])) {
+  const { username, email, password, confirmPassword } = req.body;
+  if (
+    !checkBody(req.body, ["username", "password", "email", "confirmPassword"])
+  ) {
     return res.json({ result: false, error: ErrorMessages.MISSING_FIELDS });
   }
   try {
@@ -22,6 +24,11 @@ router.post("/register", async (req, res) => {
       return res
         .status(HttpStatus.BAD_REQUEST)
         .json({ result: false, error: ErrorMessages.USER_EXISTS });
+    } else if (password !== confirmPassword) {
+      return res.status(HttpStatus.BAD_REQUEST).json({
+        result: false,
+        error: "password and confirmPassword are different",
+      });
     }
     //hashage du password
     const hashedPassword = await bcrypt.hash(password, 10);
