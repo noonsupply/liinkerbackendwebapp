@@ -11,7 +11,7 @@ const User = require("../models/users");
 /* creation d'un user with JWT rte signup */
 
 router.post("/register", async (req, res) => {
-  const { username, email, password, role } = req.body;
+  const { username, email, password } = req.body;
   if (!checkBody(req.body, ["username", "password", "email"])) {
     return res.json({ result: false, error: ErrorMessages.MISSING_FIELDS });
   }
@@ -31,7 +31,6 @@ router.post("/register", async (req, res) => {
       email,
       password: hashedPassword,
       uniqueId: uuidv4(),
-      role,
     });
     const savedUser = await newUser.save();
     let token;
