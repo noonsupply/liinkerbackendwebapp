@@ -12,7 +12,7 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-/* recupere la photo en db */
+/* recupere la photo en db, utile ???? preferable de recuperer la photo depuis le store redux ???, ou utiliser le middleware ... */
 router.get("/getPhoto/:username", (req, res) => {
   const username = req.params.username;
   User.findOne({ username }).then((data) => {
