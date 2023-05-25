@@ -6,6 +6,7 @@ const Profilchema = new mongoose.Schema({
     ref: "users",
     required: true,
   },
+  author: String,
   firstname: String,
   lastName: String,
   jobTitle: String,

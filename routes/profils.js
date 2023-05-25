@@ -4,15 +4,16 @@ const Profil = require("../models/profils");
 const User = require("../models/users");
 
 //post a profil
-router.post("/:token", async (req, res) => {
-  const { token } = req.params;
+router.post("/:uniqueId", async (req, res) => {
+  const { uniqueId } = req.params;
   try {
-    const data = await User.findOne({ token });
+    const data = await User.findOne({ uniqueId });
     if (!data) {
       return res.status(400).json({ result: false, error: "User not found !" });
     }
     const newProfil = new Profil({
       userId: data._id,
+      author: data.username,
     });
     const saveProfil = newProfil.save();
     return res.json({ result: true, saveProfil });
