@@ -11,15 +11,13 @@ const User = require("../models/users");
 /* creation d'un user with JWT rte signup */
 
 router.post("/register", async (req, res) => {
-  const { username, email, password, confirmPassword } = req.body;
-  if (
-    !checkBody(req.body, ["username", "password", "email", "confirmPassword"])
-  ) {
+  const { email, password, confirmPassword } = req.body;
+  if (!checkBody(req.body, ["password", "email", "confirmPassword"])) {
     return res.json({ result: false, error: ErrorMessages.MISSING_FIELDS });
   }
   try {
     //user existing ?
-    const existingUser = await User.findOne({ username });
+    const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res
         .status(HttpStatus.BAD_REQUEST)
@@ -34,7 +32,6 @@ router.post("/register", async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
     //creation du user
     const newUser = new User({
-      username,
       email,
       password: hashedPassword,
       uniqueId: uuidv4(),
