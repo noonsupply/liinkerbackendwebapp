@@ -4,8 +4,8 @@ const Profil = require("../models/profils");
 const User = require("../models/users");
 
 //post a profil
-router.post("/:uniqueId", async (req, res) => {
-  const { uniqueId } = req.params;
+router.post("/", async (req, res) => {
+  const { uniqueId } = req.body;
   try {
     const data = await User.findOne({ uniqueId });
     if (!data) {
