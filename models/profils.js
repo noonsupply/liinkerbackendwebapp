@@ -2,11 +2,12 @@ const mongoose = require("mongoose");
 
 const profilSchema = new mongoose.Schema({
   userId: {
-    type: Schema.Types.ObjectId,
+    type: mongoose.Schema.Types.ObjectId,
     ref: "users",
     required: true,
     unique: true,
   },
+  title: { type: String, trim: true },
   firstname: { type: String, trim: true },
   lastName: { type: String, trim: true },
   jobTitle: { type: String, trim: true },
