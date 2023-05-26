@@ -44,7 +44,7 @@ router.post("/register", async (req, res) => {
       token = jwt.sign({ userId: savedUser._id }, process.env.JWT_SECRET, {
         expiresIn: "1h",
       });
-      console.log("Generated token:", token);
+      // console.log("Generated token:", token);
     } catch (err) {
       // Si une erreur se produit lors de la génération du JWT, renvoyer une réponse d'erreur
       console.error(err);
