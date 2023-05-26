@@ -10,7 +10,6 @@ var usersRouter = require("./routes/users");
 var signinRouter = require("./routes/signin");
 var signupRouter = require("./routes/signup");
 var uploadPhoto = require("./routes/uploadPhoto");
-var profils = require("./routes/profils");
 
 var app = express();
 
@@ -25,6 +24,5 @@ app.use("/users", usersRouter);
 app.use("/signin", signinRouter);
 app.use("/signup", signupRouter);
 app.use("/upload", uploadPhoto);
-app.use("/profils", profils);
 
 module.exports = app;

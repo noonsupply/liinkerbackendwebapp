@@ -35,6 +35,7 @@ router.post("/register", async (req, res) => {
       email,
       password: hashedPassword,
       uniqueId: uuidv4(),
+      profil: [],
     });
     const savedUser = await newUser.save();
     let token;
