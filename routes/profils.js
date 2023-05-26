@@ -13,7 +13,6 @@ router.post("/", async (req, res) => {
     }
     const newProfil = new Profil({
       userId: data._id,
-      author: data.username,
     });
     const saveProfil = newProfil.save();
     return res.json({ result: true, saveProfil });
