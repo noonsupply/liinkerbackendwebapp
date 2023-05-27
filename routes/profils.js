@@ -20,6 +20,7 @@ router.post("/addProfil", async (req, res) => {
     linkedin,
     snapchat,
     instagram,
+    backgroundColor,
   } = req.body;
 
   // on pourra recuperer l'erreur si ils y as des champs manquants comme ci-dessous (a completer)
@@ -47,6 +48,7 @@ router.post("/addProfil", async (req, res) => {
       linkedin,
       snapchat,
       instagram,
+      backgroundColor,
     });
     const saveNewProfil = await newProfil.save();
     return res.json({ result: true, saveNewProfil });

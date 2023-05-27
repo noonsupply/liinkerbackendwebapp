@@ -7,6 +7,7 @@ const profilSchema = new mongoose.Schema({
     required: true,
     unique: true,
   },
+  backgroundColor: { type: String },
   title: { type: String, trim: true },
   firstname: { type: String, trim: true },
   lastName: { type: String, trim: true },
