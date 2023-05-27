@@ -51,7 +51,8 @@ router.post("/addProfil", async (req, res) => {
     const saveNewProfil = await newProfil.save();
     return res.json({ result: true, saveNewProfil });
   } catch (err) {
-    res.status(500).json({ result: false, error: err.message });
+    console.log(err);
+    res.status(500).json({ result: false, error: "Internal servor error" });
   }
 });
 
