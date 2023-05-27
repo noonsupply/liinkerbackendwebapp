@@ -25,9 +25,10 @@ router.post("/login", async (req, res) => {
         .json({ result: false, error: ErrorMessages.USER_NOT_FOUND });
     }
   } catch (err) {
+    console.log(err);
     return res
       .status(HttpStatus.INTERNAL_SERVER_ERROR)
-      .json({ result: false, error: err });
+      .json({ result: false, error: "Server internal error" });
   }
 });
 
