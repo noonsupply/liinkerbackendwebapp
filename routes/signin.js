@@ -28,7 +28,7 @@ router.post("/login", async (req, res) => {
     console.log(err);
     return res
       .status(HttpStatus.INTERNAL_SERVER_ERROR)
-      .json({ result: false, error: "Internal servor error" });
+      .json({ result: false, error: ErrorMessages.SERVER_ERROR });
   }
 });
 
