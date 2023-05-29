@@ -24,7 +24,7 @@ app.use("/", indexRouter);
 app.use("/users", usersRouter);
 app.use("/signin", signinRouter);
 app.use("/signup", signupRouter);
-app.use("/upload", uploadPhoto);
-app.use("/profils", profilsRouter);
+app.use("/upload", uploadPhoto); // rte uplaod photo
+app.use("/profils", profilsRouter); // rte profils (add etc ...)
 
 module.exports = app;
