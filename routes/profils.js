@@ -1,5 +1,6 @@
 var express = require("express");
 var router = express.Router();
+const { ErrorMessages, HttpStatus } = require("../errors/error_messages");
 
 const Profil = require("../models/profils");
 const User = require("../models/users");
@@ -27,12 +28,14 @@ router.post("/addProfil", async (req, res) => {
   if (!uniqueId || !title || !firstname) {
     return res
       .status(400)
-      .json({ result: false, error: "Missing required fields" });
+      .json({ result: false, error: ErrorMessages.MISSING_FIELDS });
   }
   try {
     const user = await User.findOne({ uniqueId });
     if (!user) {
-      return res.status(400).json({ result: false, error: "User not found" });
+      return res
+        .status(400)
+        .json({ result: false, error: ErrorMessages.USER_NOT_FOUND });
     }
     const newProfil = new Profil({
       userId: user._id,
@@ -54,7 +57,9 @@ router.post("/addProfil", async (req, res) => {
     return res.json({ result: true, saveNewProfil });
   } catch (err) {
     console.log(err);
-    res.status(500).json({ result: false, error: "Internal servor error" });
+    res
+      .status(500)
+      .json({ result: false, error: HttpStatus.INTERNAL_SERVER_ERROR });
   }
 });
 
@@ -64,7 +69,9 @@ router.get("/displayCard/:uniqueId", async (req, res) => {
   try {
     const user = await User.findOne({ uniqueId });
     if (!user) {
-      return res.status(400).json({ result: false, error: "User not found" });
+      return res
+        .status(400)
+        .json({ result: false, error: ErrorMessages.USER_NOT_FOUND });
     }
     const card = await Profil.findOne({ userId: user._id });
     if (!card) {
@@ -75,7 +82,9 @@ router.get("/displayCard/:uniqueId", async (req, res) => {
     return res.json({ result: true, card });
   } catch (err) {
     console.log(err);
-    res.status(500).json({ result: false, error: "Internal servor error" });
+    res
+      .status(500)
+      .json({ result: false, error: HttpStatus.INTERNAL_SERVER_ERROR });
   }
 });
 
