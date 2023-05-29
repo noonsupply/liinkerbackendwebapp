@@ -4,6 +4,7 @@ const ErrorMessages = {
   JWT_ERROR: "Error generating JWT",
   SERVER_ERROR: "Server error",
   USER_NOT_FOUND: "User not found or wrong password",
+  NOT_CARD_FOR_USER: "Not card currently for this user",
 };
 
 const HttpStatus = {

@@ -77,7 +77,7 @@ router.get("/displayCard/:uniqueId", async (req, res) => {
     if (!card) {
       return res
         .status(400)
-        .json({ result: false, error: "Not card currently for this user" });
+        .json({ result: false, error: ErrorMessages.NOT_CARD_FOR_USER });
     }
     return res.json({ result: true, card });
   } catch (err) {
