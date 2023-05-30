@@ -5,7 +5,6 @@ const profilSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "users",
     required: true,
-    unique: true,
   },
   backgroundColor: { type: String },
   title: { type: String, trim: true },
