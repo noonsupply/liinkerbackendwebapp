@@ -64,7 +64,7 @@ router.post("/addProfil", async (req, res) => {
 });
 
 // recupere toutes les cartes d'un utilisateur
-router.get("/displayCard/:uniqueId", async (req, res) => {
+/* router.get("/displayCard/:uniqueId", async (req, res) => {
   const { uniqueId } = req.params;
   try {
     const user = await User.findOne({ uniqueId });
@@ -80,6 +80,31 @@ router.get("/displayCard/:uniqueId", async (req, res) => {
         .json({ result: false, error: ErrorMessages.NOT_CARD_FOR_USER });
     }
     return res.json({ result: true, card });
+  } catch (err) {
+    console.log(err);
+    res
+      .status(500)
+      .json({ result: false, error: HttpStatus.INTERNAL_SERVER_ERROR });
+  }
+}); */
+
+//vnm 
+router.get("/displayCard/:uniqueId", async (req, res) => {
+  const { uniqueId } = req.params;
+  try {
+    const user = await User.findOne({ uniqueId });
+    if (!user) {
+      return res
+        .status(400)
+        .json({ result: false, error: ErrorMessages.USER_NOT_FOUND });
+    }
+    const cards = await Profil.find({ userId: user._id });
+    if (!cards || cards.length === 0) {
+      return res
+        .status(400)
+        .json({ result: false, error: ErrorMessages.NOT_CARD_FOR_USER });
+    }
+    return res.json({ result: true, cards });
   } catch (err) {
     console.log(err);
     res

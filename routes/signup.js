@@ -62,4 +62,38 @@ router.post("/register", async (req, res) => {
   }
 });
 
+//Ajouter nom et prénom à l'utilisateur
+router.post("/addUsername", async (req, res) => {
+  const { firstname, lastname, uniqueId } = req.body;
+
+  if (!checkBody(req.body, ["firstname", "lastname"])) {
+    return res.json({ result: false, error: ErrorMessages.MISSING_FIELDS });
+  }
+
+  try {
+    // Trouver l'utilisateur correspondant à l'uniqueId dans la base de données
+    const user = await User.findOne({ uniqueId });
+
+    if (!user) {
+      // Si aucun utilisateur correspondant n'est trouvé, renvoyer une réponse d'erreur
+      return res.status(HttpStatus.NOT_FOUND).json({ result: false, error: ErrorMessages.USER_NOT_FOUND });
+    }
+
+    // Mettre à jour les champs "firstname" et "lastname" de l'utilisateur
+    user.firstname = firstname;
+    user.lastname = lastname;
+
+    // Sauvegarder les modifications de l'utilisateur dans la base de données
+    await user.save();
+
+    // Renvoyer une réponse de succès
+    return res.json({ result: true, message: "Username added successfully" });
+  } catch (err) {
+    // Si une erreur se produit pendant la mise à jour de l'utilisateur, renvoyer une réponse d'erreur
+    console.error(err);
+    return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ result: false, error: ErrorMessages.SERVER_ERROR });
+  }
+});
+
+
 module.exports = router;
