@@ -19,6 +19,10 @@ const profilSchema = new mongoose.Schema({
   linkedin: { type: String, trim: true },
   snapchat: { type: String, trim: true },
   instagram: { type: String, trim: true },
+  tags: {
+    type: [String],
+    trim: true,
+  },
 
   // trim supprime les espaces inutiles  avant et aprés la chaine de caractere
 });
