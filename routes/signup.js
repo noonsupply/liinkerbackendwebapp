@@ -79,7 +79,6 @@ router.post("/addUsername", async (req, res) => {
       return res.status(HttpStatus.NOT_FOUND).json({ result: false, error: ErrorMessages.USER_NOT_FOUND });
     }
 
-    // Mettre à jour les champs "firstname" et "lastname" de l'utilisateur
     user.firstname = firstname;
     user.lastname = lastname;
 

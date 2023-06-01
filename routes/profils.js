@@ -26,7 +26,7 @@ router.post("/addProfil", async (req, res) => {
   } = req.body;
 
   // on pourra recuperer l'erreur si ils y as des champs manquants comme ci-dessous (a completer)
-  if (!uniqueId || !title || !firstname) {
+  if (!uniqueId || !lastname || !firstname) {
     return res
       .status(400)
       .json({ result: false, error: ErrorMessages.MISSING_FIELDS });
@@ -94,15 +94,20 @@ router.get("/displayCard/:uniqueId", async (req, res) => {
 router.put("/updateCard/:uniqueId", async (req, res) => {
   const { uniqueId } = req.params;
   const {
-    name,
-    adress,
-    city,
-    postalCode,
-    phone,
+    title,
+    firstname,
+    lastname,
+    jobTitle,
     email,
     website,
-    description,
-    image,
+    phone,
+    adress,
+    city,
+    linkedin,
+    snapchat,
+    instagram,
+    backgroundColor,
+    tags,
   } = req.body;
   try {
     const user = await User.findOne({ uniqueId });
@@ -120,15 +125,20 @@ router.put("/updateCard/:uniqueId", async (req, res) => {
     const cardUpdate = await Profil.findOneAndUpdate(
       { userId: user._id },
       {
-        name,
-        adress,
-        city,
-        postalCode,
-        phone,
-        email,
-        website,
-        description,
-        image,
+        title,
+    firstname,
+    lastname,
+    jobTitle,
+    email,
+    website,
+    phone,
+    adress,
+    city,
+    linkedin,
+    snapchat,
+    instagram,
+    backgroundColor,
+    tags,
       },
       {
         new: true,
