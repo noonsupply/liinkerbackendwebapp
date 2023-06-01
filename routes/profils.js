@@ -22,7 +22,7 @@ router.post("/addProfil", async (req, res) => {
     snapchat,
     instagram,
     backgroundColor,
-    tags
+    tags,
   } = req.body;
 
   // on pourra recuperer l'erreur si ils y as des champs manquants comme ci-dessous (a completer)
@@ -53,7 +53,7 @@ router.post("/addProfil", async (req, res) => {
       snapchat,
       instagram,
       backgroundColor,
-      tags
+      tags,
     });
     const saveNewProfil = await newProfil.save();
     return res.json({ result: true, saveNewProfil });
@@ -65,32 +65,7 @@ router.post("/addProfil", async (req, res) => {
   }
 });
 
-// recupere toutes les cartes d'un utilisateur
-/* router.get("/displayCard/:uniqueId", async (req, res) => {
-  const { uniqueId } = req.params;
-  try {
-    const user = await User.findOne({ uniqueId });
-    if (!user) {
-      return res
-        .status(400)
-        .json({ result: false, error: ErrorMessages.USER_NOT_FOUND });
-    }
-    const card = await Profil.findOne({ userId: user._id });
-    if (!card) {
-      return res
-        .status(400)
-        .json({ result: false, error: ErrorMessages.NOT_CARD_FOR_USER });
-    }
-    return res.json({ result: true, card });
-  } catch (err) {
-    console.log(err);
-    res
-      .status(500)
-      .json({ result: false, error: HttpStatus.INTERNAL_SERVER_ERROR });
-  }
-}); */
-
-//vnm 
+//vnm afficher les cards par utilisateur
 router.get("/displayCard/:uniqueId", async (req, res) => {
   const { uniqueId } = req.params;
   try {
@@ -112,6 +87,68 @@ router.get("/displayCard/:uniqueId", async (req, res) => {
     res
       .status(500)
       .json({ result: false, error: HttpStatus.INTERNAL_SERVER_ERROR });
+  }
+});
+
+//Modifier les cards
+router.put("/updateCard/:uniqueId", async (req, res) => {
+  const { uniqueId } = req.params;
+  const {
+    name,
+    adress,
+    city,
+    postalCode,
+    phone,
+    email,
+    website,
+    description,
+    image,
+  } = req.body;
+  try {
+    const user = await User.findOne({ uniqueId });
+    if (!user) {
+      return res
+        .status(400)
+        .json({ result: false, error: ErrorMessages.USER_NOT_FOUND });
+    }
+    const card = await Profil.findOne({ userId: user._id });
+    if (!card) {
+      return res
+        .status(400)
+        .json({ result: false, error: ErrorMessages.NOT_CARD_FOR_USER });
+    }
+    const cardUpdate = await Profil.findOneAndUpdate(
+      { userId: user._id },
+      {
+        name,
+        adress,
+        city,
+        postalCode,
+        phone,
+        email,
+        website,
+        description,
+        image,
+      },
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
+    if (!cardUpdate) {
+      return res
+        .status(400)
+        .json({ result: false, error: ErrorMessages.NOT_CARD_FOR_USER });
+    }
+    return res.status(200).json({
+      result: true,
+      data: cardUpdate,
+    });
+  } catch (error) {
+    return res.status(400).json({
+      result: false,
+      error: ErrorMessages.NOT_CARD_FOR_USER,
+    });
   }
 });
 
