@@ -126,19 +126,19 @@ router.put("/updateCard/:uniqueId", async (req, res) => {
       { userId: user._id },
       {
         title,
-    firstname,
-    lastname,
-    jobTitle,
-    email,
-    website,
-    phone,
-    adress,
-    city,
-    linkedin,
-    snapchat,
-    instagram,
-    backgroundColor,
-    tags,
+        firstname,
+        lastname,
+        jobTitle,
+        email,
+        website,
+        phone,
+        adress,
+        city,
+        linkedin,
+        snapchat,
+        instagram,
+        backgroundColor,
+        tags,
       },
       {
         new: true,
@@ -193,6 +193,5 @@ router.delete("/deleteCard/:uniqueId", async (req, res) => {
     });
   }
 });
-
 
 module.exports = router;
