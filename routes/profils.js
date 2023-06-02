@@ -162,4 +162,37 @@ router.put("/updateCard/:uniqueId", async (req, res) => {
   }
 });
 
+// Supprimer une carte de visite
+router.delete("/deleteCard/:uniqueId", async (req, res) => {
+  const { uniqueId } = req.params;
+  try {
+    const user = await User.findOne({ uniqueId });
+    if (!user) {
+      return res
+        .status(400)
+        .json({ result: false, error: ErrorMessages.USER_NOT_FOUND });
+    }
+
+    const card = await Profil.findOne({ userId: user._id });
+    if (!card) {
+      return res
+        .status(400)
+        .json({ result: false, error: ErrorMessages.NOT_CARD_FOR_USER });
+    }
+
+    await Profil.findOneAndDelete({ userId: user._id });
+
+    return res.status(200).json({
+      result: true,
+      message: "Card deleted successfully",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      result: false,
+      error: HttpStatus.INTERNAL_SERVER_ERROR,
+    });
+  }
+});
+
+
 module.exports = router;
