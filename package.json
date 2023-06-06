@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "nodemon ./bin/www"
+    "start": "node ./bin/www"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
@@ -19,8 +19,11 @@
     "morgan": "~1.9.1",
     "node-fetch": "2",
     "nodemailer": "^6.9.2",
-    "nodemon": "^2.0.22",
     "uniqid": "^5.4.0",
     "uuidv4": "^6.2.13"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.22"
   }
 }
+
