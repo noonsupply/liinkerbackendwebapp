@@ -13,6 +13,8 @@ router.get("/", function (req, res, next) {
   res.send("respond with a resource");
 });
 
+//essaie à terminer
+
 /* get All user */
 router.get("/allUser", async (req, res) => {
   try {
