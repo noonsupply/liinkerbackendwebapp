@@ -11,6 +11,8 @@ var signinRouter = require("./routes/signin");
 var signupRouter = require("./routes/signup");
 var uploadPhoto = require("./routes/uploadPhoto");
 var profilsRouter = require("./routes/profils");
+var roomsRouter = require("./routes/rooms");
+var roomProfilesRouter = require("./routes/roomProfiles");
 
 var app = express();
 
@@ -24,7 +26,10 @@ app.use("/", indexRouter);
 app.use("/users", usersRouter);
 app.use("/signin", signinRouter);
 app.use("/signup", signupRouter);
-app.use("/upload", uploadPhoto); // rte uplaod photo
-app.use("/profils", profilsRouter); // rte profils (add etc ...)
+app.use("/upload", uploadPhoto); 
+app.use("/profils", profilsRouter);
+app.use("/rooms", roomsRouter);
+app.use("/roomProfiles", roomProfilesRouter);
+
 
 module.exports = app;

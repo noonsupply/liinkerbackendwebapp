@@ -1,6 +1,5 @@
 const express = require('express');
-const Room = require('../models/Room');
-const RoomProfile = require('../models/RoomProfile');
+const RoomProfile = require('../models/RoomProfiles');
 const router = express.Router();
 
 
@@ -31,3 +30,4 @@ router.post('/room-profiles', async (req, res) => {
     }
   });
   
+  module.exports = router;
