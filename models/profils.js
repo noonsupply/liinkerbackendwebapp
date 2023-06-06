@@ -1,4 +1,6 @@
+const { strict } = require("assert");
 const mongoose = require("mongoose");
+const { stringify } = require("querystring");
 
 const profilSchema = new mongoose.Schema({
   userId: {
@@ -7,6 +9,7 @@ const profilSchema = new mongoose.Schema({
     required: true,
   },
   backgroundColor: { type: String },
+  image: {type: String, trim: true},
   title: { type: String, trim: true },
   firstname: { type: String, trim: true },
   lastname: { type: String, trim: true },

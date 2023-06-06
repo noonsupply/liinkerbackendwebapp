@@ -9,6 +9,7 @@ const User = require("../models/users");
 router.post("/addProfil", async (req, res) => {
   const {
     uniqueId,
+    image,
     title,
     firstname,
     lastname,
@@ -40,6 +41,7 @@ router.post("/addProfil", async (req, res) => {
     }
     const newProfil = new Profil({
       userId: user._id,
+      image,
       title,
       firstname,
       lastname,
@@ -94,6 +96,7 @@ router.get("/displayCard/:uniqueId", async (req, res) => {
 router.put("/updateCard/:uniqueId", async (req, res) => {
   const { uniqueId } = req.params;
   const {
+    image,
     title,
     firstname,
     lastname,
@@ -125,6 +128,7 @@ router.put("/updateCard/:uniqueId", async (req, res) => {
     const cardUpdate = await Profil.findOneAndUpdate(
       { userId: user._id },
       {
+        image,
         title,
         firstname,
         lastname,
