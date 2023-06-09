@@ -8,11 +8,12 @@ const roomProfileSchema = new mongoose.Schema({
   },
   profileId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Profile',
+    ref: 'Profils',
     required: true
   },
   validity: {
-    type: String,
+    type: Date,
+    required: true,
   }
 });
 

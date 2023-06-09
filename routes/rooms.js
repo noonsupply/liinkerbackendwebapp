@@ -35,7 +35,7 @@ router.post("/createRooms", async (req, res) => {
   }
 });
 
-router.get("/rooms/:roomId", async (req, res) => {
+router.get("/roomsFinding/:roomId", async (req, res) => {
   try {
     const room = await Room.findOne({ roomId: req.params.roomId });
     if (room == null) {
