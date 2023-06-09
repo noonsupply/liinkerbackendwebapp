@@ -2,9 +2,18 @@ const express = require('express');
 const RoomProfile = require('../models/roomProfiles');
 const router = express.Router();
 const Room = require('../models/rooms');
+const User = require("../models/users");
+const Profil = require("../models/profils");
 
-router.post('/ajouter-room', async (req, res) => {
-  const { roomId, userId } = req.body;
+const mongoose = require('mongoose');
+
+router.post('/addingUserInRoom', async (req, res) => {
+  const { roomId, uniqueId, profileId } = req.body;
+
+  // Assurez-vous que tous les champs requis sont présents
+  if (!roomId || !uniqueId || !profileId) {
+    return res.status(400).json({ result: false, error: ErrorMessages.MISSING_FIELDS });
+  }
 
   try {
     // Vérifier si la room existe
@@ -15,10 +24,17 @@ router.post('/ajouter-room', async (req, res) => {
     }
 
     // Vérifier si le RoomProfile existe déjà pour cet utilisateur
-    const existingProfile = await RoomProfile.findOne({ roomId, profileId: userId });
+    const existingProfile = await RoomProfile.findOne({ roomId, profileId });
 
     if (existingProfile) {
       return res.status(409).json({ error: 'Utilisateur déjà présent dans la room' });
+    }
+
+    // Vérifier si l'utilisateur existe
+    const user = await User.findOne({ uniqueId: uniqueId });
+
+    if (!user) {
+      return res.status(404).json({ error: 'L\'utilisateur n\'existe pas' });
     }
 
     // Calculer la date et heure de validité
@@ -28,19 +44,25 @@ router.post('/ajouter-room', async (req, res) => {
     // Créer une nouvelle instance de RoomProfile
     const roomProfile = new RoomProfile({
       roomId,
-      profileId: userId,
+      userId: user._id,
+      profileId,
       validity,
     });
 
     // Enregistrer le RoomProfile dans la base de données
     await roomProfile.save();
 
-    return res.status(200).json({ message: 'Utilisater ajoutée avec succès dans la room' });
+    return res.status(200).json({ message: 'Utilisateur ajouté avec succès dans la room' });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ error: 'Erreur lors de l\'ajout de la room' });
   }
 });
+
+
+
+
+
 
 
   

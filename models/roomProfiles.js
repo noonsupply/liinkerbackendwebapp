@@ -6,9 +6,14 @@ const roomProfileSchema = new mongoose.Schema({
     ref: 'Room',
     required: true
   },
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'users',
+    required: true
+  },
   profileId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Profils',
+    ref: 'profils',
     required: true
   },
   validity: {
@@ -17,5 +22,5 @@ const roomProfileSchema = new mongoose.Schema({
   }
 });
 
-const RoomProfile = mongoose.model('RoomProfile', roomProfileSchema);
+const RoomProfile = mongoose.model('roomprofiles', roomProfileSchema);
 module.exports = RoomProfile;
