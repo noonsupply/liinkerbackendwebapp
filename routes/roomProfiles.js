@@ -76,7 +76,7 @@ router.get("/getAllRoomProfiles/:roomId", async (req, res) => {
     if (roomProfiles == null) {
       return res.status(404).json({ message: "Cannot find profiles" });
     }
-    res.json(roomProfiles);
+    res.json({result: true, roomProfiles});
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
