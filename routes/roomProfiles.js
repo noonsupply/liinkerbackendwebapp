@@ -4,11 +4,14 @@ const router = express.Router();
 const Room = require('../models/rooms');
 const User = require("../models/users");
 const Profil = require("../models/profils");
+const { ErrorMessages, HttpStatus } = require("../errors/error_messages");
 
 const mongoose = require('mongoose');
 
 router.post('/addingUserInRoom', async (req, res) => {
   const { roomId, uniqueId, profileId } = req.body;
+
+  console.log("roomProf", req.body)
 
   // Assurez-vous que tous les champs requis sont présents
   if (!roomId || !uniqueId || !profileId) {
