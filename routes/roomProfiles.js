@@ -3,19 +3,36 @@ const RoomProfile = require('../models/roomProfiles');
 const router = express.Router();
 
 
-router.post('/room-profiles', async (req, res) => {
-    const roomProfile = new RoomProfile({
-      roomId: req.body.roomId,
-      profileId: req.body.profileId
-    });
-  
-    try {
-      const savedRoomProfile = await roomProfile.save();
-      res.json(savedRoomProfile);
-    } catch (err) {
-      res.status(400).json({ message: err.message });
-    }
+router.post('/ajouter-room', async (req, res) => {
+  const { roomId, userId } = req.body;
+
+  // Vérifier si la room existe
+  const roomExists = "";
+
+  if (!roomExists) {
+    return res.status(404).json({ error: 'La room n\'existe pas' });
+  }
+
+  // Calculer la date et heure de validité
+  const validity = new Date();
+  validity.setHours(validity.getHours() + 5);
+
+  // Créer une nouvelle instance de RoomProfile
+  const roomProfile = new RoomProfile({
+    roomId,
+    profileId: userId,
+    validity,
   });
+
+  try {
+    // Enregistrer le RoomProfile dans la base de données
+    await roomProfile.save();
+    return res.status(200).json({ message: 'Room ajoutée avec succès' });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: 'Erreur lors de l\'ajout de la room' });
+  }
+});
   
 
   router.get('/room-profiles/:roomId', async (req, res) => {
