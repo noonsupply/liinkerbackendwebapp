@@ -3,7 +3,7 @@ var router = express.Router();
 const { checkBody } = require("../modules/checkBody");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
-const { ErrorMessages, HttpStatus } = require("../errors/error_messages")");
+const { ErrorMessages, HttpStatus } = require("../errors/error_messages");
 
 const User = require("../models/users");
 
