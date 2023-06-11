@@ -13,6 +13,8 @@ var uploadPhoto = require("./routes/uploadPhoto");
 var profilsRouter = require("./routes/profils");
 var roomsRouter = require("./routes/rooms");
 var roomProfilesRouter = require("./routes/roomProfiles");
+var signupAdminRouter = require("./routes/signupAdmin");
+var signinAdminRouter = require("./routes/signinAdmin");
 
 var app = express();
 
@@ -26,10 +28,11 @@ app.use("/", indexRouter);
 app.use("/users", usersRouter);
 app.use("/signin", signinRouter);
 app.use("/signup", signupRouter);
-app.use("/upload", uploadPhoto); 
+app.use("/upload", uploadPhoto);
 app.use("/profils", profilsRouter);
 app.use("/rooms", roomsRouter);
 app.use("/roomProfiles", roomProfilesRouter);
-
+app.use("/signupAdmin", signupAdminRouter);
+app.use("/signinAdmin", signinAdminRouter);
 
 module.exports = app;
