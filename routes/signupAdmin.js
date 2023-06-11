@@ -8,7 +8,7 @@ const { ErrorMessages, HttpStatus } = require("../errors/error_messages");
 
 const Admin = require("../models/admins");
 
-/* creation d'un user with JWT rte signup */
+/* creation d'un admin with JWT rte signup */
 
 router.post("/register", async (req, res) => {
   const { email, password } = req.body;
