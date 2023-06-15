@@ -35,6 +35,20 @@ router.get("/allUser", async (req, res) => {
   }
 });
 
+/* delete user by uniqueId */
+router.delete("/deleteUser/:uniqueId", async (req, res) => {
+  const { uniqueId } = req.params;
+  try {
+    const existingUser = await User.findOneAndDelete({ uniqueId });
+    if (!existingUser) {
+      return res.status(404).json({ result: false, error: "User not found" });
+    }
+    return res.json({ result: true, message: "User deleted successfully" });
+  } catch (err) {
+    return res.status(500).json({ result: false, error: err.message });
+  }
+});
+
 /* Change password */
 router.post("/forgetPassword", async (req, res) => {
   // on veut trouver l'utilisateur dans la base de donnée avec une entree email
