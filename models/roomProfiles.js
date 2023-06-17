@@ -3,7 +3,6 @@ const mongoose = require('mongoose');
 const roomProfileSchema = new mongoose.Schema({
   roomId: {
     type: String,
-    ref: 'Room',
     required: true
   },
   userId: {
