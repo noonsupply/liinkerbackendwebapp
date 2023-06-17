@@ -16,9 +16,24 @@ router.get("/rooms", async (req, res) => {
       result: true,
       roomsLength: existingRooms.length,
       roomName: existingRooms.map((room) => room.roomName),
+      existingRooms: existingRooms,
     });
   } catch (err) {
     res.status(500).json({ message: err.message });
+  }
+});
+
+//delete rooms by id
+router.delete("/deleteRooms/:id", async (req, res) => {
+  const { id } = req.params;
+  try {
+    const existingRoom = await Room.findByIdAndDelete(id);
+    if (existingRoom.length === 0) {
+      return res.status(404).json({ message: "Cannot find room" });
+    }
+    return res.json({ result: true });
+  } catch (err) {
+    return res.status(500).json({ message: err.message });
   }
 });
 
