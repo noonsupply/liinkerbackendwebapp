@@ -230,4 +230,23 @@ router.delete("/deleteCard/:uniqueId/:profilId", async (req, res) => {
   }
 });
 
+// Get all detail from one cardId
+router.get("/getCardDetail/:profilId", async (req, res) => {
+  try {
+    // get the profile by id and populate with other details like owner name etc..
+    const profile = await Profil.findOne({ _id: req.params.profilId }).populate("userId");
+    
+    if (!profile) {
+      return res.status(400).json({ error: ErrorMessages.NOT_CARD_FOR_USER });
+    }
+    
+    return res.status(200).json(profile);
+  } catch (error) {
+    console.error(error.message);
+    return res.status(500).json({ error: error });
+  }
+});
+
+
+
 module.exports = router;

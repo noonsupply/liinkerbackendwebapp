@@ -118,6 +118,26 @@ router.get("/getRoomProfiles/:uniqueId", async (req, res) => {
   }
 });
 
+//route to delete room
+router.delete("/deleteRoomProfile/:id", async (req, res) => {
+  try {
+    await RoomProfile.deleteOne({ _id: req.params.id });
+    res.status(200).json({ result: true, message: "Room deleted" });
+  } catch (err) {
+    res.status(500).json({ result: false, message: err.message });
+  }
+});
+
+//route to delete room
+router.delete("/deleteRoomProfileByRoomId/:roomId", async (req, res) => {
+  try {
+    await RoomProfile.deleteMany({ roomId: req.params.roomId });
+    res.status(200).json({ result: true, message: "Room deleted" });
+  } catch (err) {
+    res.status(500).json({ result: false, message: err.message });
+  }
+});
+
 
 
 
