@@ -230,4 +230,22 @@ router.delete("/deleteCard/:uniqueId/:profilId", async (req, res) => {
   }
 });
 
+//display all cards
+router.get("/displayAllCards", async (req, res) => {
+  try {
+    const cards = await Profil.find();
+    if (!cards || cards.length === 0) {
+      return res
+        .status(400)
+        .json({ result: false, error: ErrorMessages.NOT_CARD_FOR_USER });
+    }
+    return res.json({ result: true, cards });
+  } catch (err) {
+    console.log(err);
+    res
+      .status(500)
+      .json({ result: false, error: HttpStatus.INTERNAL_SERVER_ERROR });
+  }
+});
+
 module.exports = router;
