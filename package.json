@@ -3,8 +3,10 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "nodemon ./bin/www"
+    "start": "nodemon ./bin/www",
+    "heroku-postbuild": "npm install && echo \"Changing start command to use node instead of nodemon in production\" && sed -i'' -e 's/nodemon/node/g' package.json"
   },
+  
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "cloudinary": "^1.37.0",
