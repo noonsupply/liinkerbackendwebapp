@@ -3,9 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "nodemon ./bin/www",
-    "start:prod": "node ./bin/www",
-    "heroku-postbuild": "yarn install",
+    "start": "node ./bin/www",
+    "dev": "nodemon ./bin/www",
     "lint": "eslint ."
   },
   "engines": {
