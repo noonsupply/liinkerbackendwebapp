@@ -1,17 +1,17 @@
 const mongoose = require('mongoose');
 
-const userContactsSchema = new mongoose.Schema({
+const usercontactSchema = new mongoose.Schema({
   userId: { 
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'users',  // Assurez-vous que 'User' est le nom du modèle User
+    ref: 'users',
     required: true 
   },
   contacts: [{ 
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'profils'  // Assurez-vous que 'Profile' est le nom du modèle Profile
+    ref: 'profils'
   }]
 });
 
-const UserContacts = mongoose.model('UserContacts', userContactsSchema);
+module.exports = mongoose.model('usercontacts', usercontactSchema);
 
-module.exports = UserContacts;
+
