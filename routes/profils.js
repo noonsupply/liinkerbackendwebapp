@@ -230,7 +230,6 @@ router.delete("/deleteCard/:uniqueId/:profilId", async (req, res) => {
   }
 });
 
-<<<<<<< HEAD
 // Get all detail from one cardId
 router.get("/getCardDetail/:profilId", async (req, res) => {
   try {
@@ -250,7 +249,6 @@ router.get("/getCardDetail/:profilId", async (req, res) => {
 
 
 
-=======
 //display all cards
 router.get("/displayAllCards", async (req, res) => {
   try {
@@ -269,5 +267,4 @@ router.get("/displayAllCards", async (req, res) => {
   }
 });
 
->>>>>>> e74dba2ae98086db3f231aec128979c26b98c9c9
 module.exports = router;
