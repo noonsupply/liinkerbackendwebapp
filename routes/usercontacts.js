@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const UserContact = require('../models/usercontacts');
 const User = require('../models/users');
+const Profil = require('../models/profils');
 
 
 
@@ -79,6 +80,21 @@ router.post('/addContact', async (req, res) => {
     }
   });
   
+  //create route to get detail from one profil
+  router.get('/getProfil/:profilId', async (req, res) => {
+    const { profilId } = req.params;
+  
+    try{
+      var profil = await Profil.findOne({ _id: profilId });
+      if (!profil) {
+        return res.status(404).json({ error: 'Profil not found' });
+      }
+  
+      return res.status(200).json({ result: true, profil });
+    } catch (error) {
+      return res.status(500).json({ error: error.message });
+    }
+  });
   
 
 module.exports = router;
