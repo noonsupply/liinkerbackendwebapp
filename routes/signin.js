@@ -9,7 +9,6 @@ const User = require("../models/users");
 
 router.post("/login", async (req, res) => {
 
-  console.log("bibiche", req.body)
   if (!checkBody(req.body, ["email", "password"])) {
     return res.json({ result: false, error: ErrorMessages.MISSING_FIELDS });
   }
