@@ -98,9 +98,12 @@ router.get("/getRoomProfiles/:uniqueId", async (req, res) => {
   
   try {
     // Use the user's _id to find associated RoomProfile documents
-    const roomProfiles = await RoomProfile.find({
+    const roomProfiles = await Room.find({
       userId: user._id,
     });
+
+    // Check if room profiles exist
+    console.log(roomProfiles)
 
     if (roomProfiles.length === 0) {
       return res.status(404).json({ result: false, message: "No room profiles found for this user" });
@@ -121,7 +124,7 @@ router.get("/getRoomProfiles/:uniqueId", async (req, res) => {
 //route to delete room
 router.delete("/deleteRoomProfile/:id", async (req, res) => {
   try {
-    await RoomProfile.deleteOne({ _id: req.params.id });
+    await Room.deleteOne({ _id: req.params.id });
     res.status(200).json({ result: true, message: "Room deleted" });
   } catch (err) {
     res.status(500).json({ result: false, message: err.message });

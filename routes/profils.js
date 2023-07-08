@@ -93,8 +93,8 @@ router.get("/displayCard/:uniqueId", async (req, res) => {
 });
 
 //Modifier les cards
-router.put("/updateCard/:uniqueId", async (req, res) => {
-  const { uniqueId } = req.params;
+router.put("/updateCard/:uniqueId/:profilId", async (req, res) => {
+  const { uniqueId, profilId } = req.params;
   const {
     image,
     title,
@@ -119,14 +119,14 @@ router.put("/updateCard/:uniqueId", async (req, res) => {
         .status(400)
         .json({ result: false, error: ErrorMessages.USER_NOT_FOUND });
     }
-    const card = await Profil.findOne({ userId: user._id });
+    const card = await Profil.findOne({ userId: user._id, _id: profilId  });
     if (!card) {
       return res
         .status(400)
         .json({ result: false, error: ErrorMessages.NOT_CARD_FOR_USER });
     }
     const cardUpdate = await Profil.findOneAndUpdate(
-      { userId: user._id },
+      { userId: user._id, _id: profilId},
       {
         image,
         title,
