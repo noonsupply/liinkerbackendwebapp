@@ -7,13 +7,16 @@ const User = require("../models/users");
 const authMiddleware = require("../middlewares/authMiddleware");
 const ErrorMessages = require("../errors/error_messages");
 const HttpStatus = require("../errors/error_messages");
+const mongoose = require('mongoose');
+const UserContacts = require("../models/usercontacts");
+const Profile = require("../models/profils");
+const RoomProfiles = require("../models/roomProfiles");
+const Rooms = require("../models/rooms");
 
 /* GET users listing. */
 router.get("/", function (req, res, next) {
   res.send("respond with a resource");
 });
-
-//essaie à terminer
 
 /* get All user */
 router.get("/allUser", async (req, res) => {
@@ -38,16 +41,46 @@ router.get("/allUser", async (req, res) => {
 /* delete user by uniqueId */
 router.delete("/deleteUser/:uniqueId", async (req, res) => {
   const { uniqueId } = req.params;
+
+  const session = await mongoose.startSession();
+  session.startTransaction();
+  
   try {
-    const existingUser = await User.findOneAndDelete({ uniqueId });
+    const opts = { session };
+
+    // Recherchez l'utilisateur par son uniqueId
+    const existingUser = await User.findOne({ uniqueId });
     if (!existingUser) {
       return res.status(404).json({ result: false, error: "User not found" });
     }
-    return res.json({ result: true, message: "User deleted successfully" });
+
+    // Supprimez l'utilisateur
+    await User.deleteOne({ uniqueId }, opts);
+
+    // Supprimez les contacts de l'utilisateur
+    await UserContacts.deleteOne({ userId: existingUser._id }, opts);
+
+    // Supprimez le profil de l'utilisateur
+    await Profile.deleteOne({ userId: existingUser._id }, opts);
+
+    // Supprimez le profil de la salle de l'utilisateur
+    await RoomProfiles.deleteMany({ userId: existingUser._id }, opts);
+
+    // Supprimez les salles de l'utilisateur
+    await Rooms.deleteMany({ userId: existingUser._id }, opts);
+
+    await session.commitTransaction();
+    session.endSession();
+
+    return res.json({ result: true, message: "User and related documents deleted successfully" });
+
   } catch (err) {
+    await session.abortTransaction();
+    session.endSession();
     return res.status(500).json({ result: false, error: err.message });
   }
 });
+
 
 /* Change password */
 router.post("/forgetPassword", async (req, res) => {
