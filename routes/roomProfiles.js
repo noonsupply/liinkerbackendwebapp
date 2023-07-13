@@ -26,15 +26,6 @@ router.post("/addingUserInRoom", async (req, res) => {
       return res.status(404).json({ error: "La room n'existe pas" });
     }
 
-    // Vérifier si le RoomProfile existe déjà pour cet utilisateur
-    const existingProfile = await RoomProfile.findOne({ roomId, profileId });
-
-    if (existingProfile) {
-      return res
-        .status(409)
-        .json({ error: "Utilisateur déjà présent dans la room" });
-    }
-
     // Vérifier si l'utilisateur existe
     const user = await User.findOne({ uniqueId: uniqueId });
 
@@ -66,19 +57,34 @@ router.post("/addingUserInRoom", async (req, res) => {
   }
 });
 
-router.get("/getAllRoomProfiles/:roomId", async (req, res) => {
+router.get("/getAllRoomProfiles/:roomId/:uniqueId", async (req, res) => {
   try {
     const roomProfiles = await RoomProfile.find({
       roomId: req.params.roomId,
     }).populate("profileId");
-    if (roomProfiles == null) {
+
+    const user = await User.findOne({ uniqueId: req.params.uniqueId });
+    if (!user) {
+      return res
+        .status(400)
+        .json({ result: false, error: ErrorMessages.USER_NOT_FOUND });
+    }
+
+    if (!roomProfiles || roomProfiles.length === 0) {
       return res.status(404).json({ message: "Cannot find profiles" });
     }
-    res.json({result: true, roomProfiles});
+
+    // Filtrer pour enlever le profil avec l'userId spécifique
+    const filteredRoomProfiles = roomProfiles.filter(profile => profile.profileId.userId.toString() !== user._id.toString());
+
+    res.json({result: true, roomProfiles: filteredRoomProfiles});
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 });
+
+
+
 
 //route to list in which room i'm connected with my uniqueId
 router.get("/getRoomProfiles/:uniqueId", async (req, res) => {
