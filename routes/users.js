@@ -72,7 +72,8 @@ router.delete("/deleteUser/:uniqueId", async (req, res) => {
     await session.commitTransaction();
     session.endSession();
 
-    return res.json({ result: true, message: "User and related documents deleted successfully" });
+    return res.json({ success: true, message: "User and related documents deleted successfully" });
+
 
   } catch (err) {
     await session.abortTransaction();
