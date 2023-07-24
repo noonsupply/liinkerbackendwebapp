@@ -16,6 +16,7 @@ var roomProfilesRouter = require("./routes/roomProfiles");
 var signupAdminRouter = require("./routes/signupAdmin");
 var signinAdminRouter = require("./routes/signinAdmin");
 var usercontacts = require("./routes/usercontacts");
+var gpsPosition = require("./routes/gpsPosition")
 
 var app = express();
 const cors = require("cors");
@@ -38,6 +39,8 @@ app.use("/roomProfiles", roomProfilesRouter);
 app.use("/signupAdmin", signupAdminRouter);
 app.use("/signinAdmin", signinAdminRouter);
 app.use("/usercontacts", usercontacts);
+app.use("/gpsPosition", gpsPosition);
+
 
 
 module.exports = app;
