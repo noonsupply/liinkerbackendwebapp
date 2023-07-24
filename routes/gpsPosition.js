@@ -7,6 +7,7 @@ router.get('/nearby', async (req, res) => {
   const { longitude, latitude } = req.query;
 
   const radiusInRadians = 30 / 6371; // Convertir 30 mètres en radians
+  const thirtyMinutesAgo = new Date(Date.now() - 30 * 60 * 1000); // Calculer l'heure qu'il était il y a 30 minutes
 
   try {
     const positions = await GPSPosition.find({
@@ -14,6 +15,9 @@ router.get('/nearby', async (req, res) => {
         $geoWithin: {
           $centerSphere: [[longitude, latitude], radiusInRadians]
         }
+      },
+      updatedAt: {
+        $gte: thirtyMinutesAgo,
       }
     });
 
@@ -25,21 +29,24 @@ router.get('/nearby', async (req, res) => {
   }
 });
 
+
 router.put('/position/:id/gps', async (req, res) => {
   const { id } = req.params;
-  const { longitude, latitude } = req.body;
+  const { longitude, latitude, profileId } = req.body;
 
   try {
-    let position = await GPSPosition.findOne({ uniqueId: id });
+    let position = await GPSPosition.findOne({ profileId: profileId });
 
     if (position) {
       // Si un document existe déjà pour cet utilisateur, mettez-le à jour
       position.type = 'Point';
       position.coordinates = [longitude, latitude];
+      position.updatedAt = Date.now();
     } else {
       // Si aucun document n'existe pour cet utilisateur, créez-en un nouveau
       position = new GPSPosition({
         uniqueId: id,
+        profileId: profileId,
         type: 'Point',
         coordinates: [longitude, latitude]
       });
@@ -52,8 +59,5 @@ router.put('/position/:id/gps', async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 });
-
-  
-
 
 module.exports = router;

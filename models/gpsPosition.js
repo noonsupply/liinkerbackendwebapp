@@ -6,6 +6,11 @@ const GPSPositionSchema = new mongoose.Schema({
     ref: 'users',
     required: true
   },
+  profileId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'profils',
+    required: true
+  },
   type: {
     type: String,
     enum: ['Point'],
@@ -15,6 +20,10 @@ const GPSPositionSchema = new mongoose.Schema({
     type: [Number],
     required: true
   },
+  updatedAt: {
+    type: Date,
+    default: Date.now,
+  }
 });
 
 GPSPositionSchema.index({ coordinates: '2dsphere' });
