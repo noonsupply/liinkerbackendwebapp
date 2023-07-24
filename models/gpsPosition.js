@@ -19,5 +19,5 @@ const GPSPositionSchema = new mongoose.Schema({
 
 GPSPositionSchema.index({ coordinates: '2dsphere' });
 
-module.exports = mongoose.model('GPSPosition', GPSPositionSchema);
+module.exports = mongoose.model('gpsPosition', GPSPositionSchema);
 

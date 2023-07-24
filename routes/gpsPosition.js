@@ -25,25 +25,34 @@ router.get('/nearby', async (req, res) => {
   }
 });
 
-router.post('/position/:id/gps', async (req, res) => {
-    const { id } = req.params;
-    const { longitude, latitude } = req.body;
-  
-    try {
-      // Créer un nouveau document GPSPosition avec les coordonnées fournies et l'ID utilisateur
-      const position = new GPSPosition({
+router.put('/position/:id/gps', async (req, res) => {
+  const { id } = req.params;
+  const { longitude, latitude } = req.body;
+
+  try {
+    let position = await GPSPosition.findOne({ uniqueId: id });
+
+    if (position) {
+      // Si un document existe déjà pour cet utilisateur, mettez-le à jour
+      position.type = 'Point';
+      position.coordinates = [longitude, latitude];
+    } else {
+      // Si aucun document n'existe pour cet utilisateur, créez-en un nouveau
+      position = new GPSPosition({
         uniqueId: id,
         type: 'Point',
         coordinates: [longitude, latitude]
       });
-  
-      await position.save();
-  
-      res.json(position);
-    } catch (err) {
-      res.status(500).json({ message: err.message });
     }
-  });
+
+    await position.save();
+
+    res.json(position);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
   
 
 
