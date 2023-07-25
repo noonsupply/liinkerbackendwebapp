@@ -3,45 +3,64 @@ const router = express.Router();
 const User = require("../models/users");
 const GPSPosition = require('../models/gpsPosition');
 
-router.get('/nearby', async (req, res) => {
-  let { longitude, latitude } = req.query;
+const { ObjectId } = require('mongodb'); // Ajouter en haut de votre fichier
 
-  // Vérifiez si la longitude et la latitude sont présentes
+router.get('/nearby', async (req, res) => {
+  let { longitude, latitude, profileId } = req.query;
+  const profileIdObj = new ObjectId(profileId);
+
   if (!longitude || !latitude) {
     return res.status(400).json({ message: 'Les coordonnées de longitude et de latitude sont requises.' });
   }
 
-  // Essayez de convertir les coordonnées en nombre
   longitude = parseFloat(longitude);
   latitude = parseFloat(latitude);
 
-  // Vérifiez si la conversion a réussi
   if (isNaN(longitude) || isNaN(latitude)) {
     return res.status(400).json({ message: 'Les coordonnées de longitude et de latitude doivent être des nombres.' });
   }
 
-  const radiusInRadians = 30 / 6371; // Convertir 30 mètres en radians
-  const thirtyMinutesAgo = new Date(Date.now() - 30 * 60 * 1000); // Calculer l'heure qu'il était il y a 30 minutes
+  const thirtyMinutesAgo = new Date(Date.now() - 30 * 60 * 1000);
 
   try {
-    const positions = await GPSPosition.find({
-      coordinates: {
-        $geoWithin: {
-          $centerSphere: [[longitude, latitude], radiusInRadians]
+    const positions = await GPSPosition.aggregate([
+      {
+        $geoNear: {
+          near: {
+            type: "Point",
+            coordinates: [longitude, latitude]
+          },
+          distanceField: "dist.calculated",
+          maxDistance: 30,
+          spherical: true
         }
       },
-      updatedAt: {
-        $gte: thirtyMinutesAgo,
+      {
+        $match: {
+          updatedAt: {
+            $gte: thirtyMinutesAgo
+          },
+          profileId: {
+            $ne: profileIdObj
+          }
+        }
+      },
+      {
+        $lookup: {
+          from: "profils",
+          localField: "profileId",
+          foreignField: "_id",
+          as: "profile"
+        }
       }
-    });
+    ]);
 
-    const users = await User.find({ gpsPosition: { $in: positions.map(position => position._id) } });
-
-    res.json(users);
+    res.json(positions);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 });
+
 
 
 
