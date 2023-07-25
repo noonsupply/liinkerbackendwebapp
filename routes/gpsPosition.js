@@ -20,7 +20,7 @@ router.get('/nearby', async (req, res) => {
     return res.status(400).json({ message: 'Les coordonnées de longitude et de latitude doivent être des nombres.' });
   }
 
-  const thirtyMinutesAgo = new Date(Date.now() - 30 * 60 * 1000);
+  const thirtyMinutesAgo = new Date(Date.now() - 60 * 1000);
 
   try {
     const positions = await GPSPosition.aggregate([
