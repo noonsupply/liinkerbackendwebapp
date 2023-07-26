@@ -8,6 +8,7 @@ const { ObjectId } = require('mongodb'); // Ajouter en haut de votre fichier
 router.get('/nearby', async (req, res) => {
   let { longitude, latitude, profileId } = req.query;
   const profileIdObj = new ObjectId(profileId);
+  console.log("Received profileId:", profileId);
 
   if (!longitude || !latitude) {
     return res.status(400).json({ message: 'Les coordonnées de longitude et de latitude sont requises.' });
