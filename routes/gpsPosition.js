@@ -17,8 +17,11 @@ router.get('/nearby', async (req, res) => {
   longitude = parseFloat(longitude);
   latitude = parseFloat(latitude);
 
-  if (isNaN(longitude) || isNaN(latitude)) {
-    return res.status(400).json({ message: 'Les coordonnées de longitude et de latitude doivent être des nombres.' });
+  if (
+    isNaN(longitude) || longitude < -180 || longitude > 180 || 
+    isNaN(latitude) || latitude < -90 || latitude > 90
+  ) {
+    return res.status(400).json({ message: 'Les coordonnées de longitude et de latitude sont invalides.' });
   }
 
   const thirtyMinutesAgo = new Date(Date.now() - 60 * 1000);
@@ -70,30 +73,37 @@ router.put('/position/:id/gps', async (req, res) => {
   const { id } = req.params;
   const { longitude, latitude, profileId } = req.body;
 
-  try {
-    let position = await GPSPosition.findOne({ profileId: profileId });
+  // Validation des coordonnées
+  if (
+    !longitude || !latitude || 
+    isNaN(longitude) || longitude < -180 || longitude > 180 || 
+    isNaN(latitude) || latitude < -90 || latitude > 90
+  ) {
+    return res.status(400).json({ message: 'Les coordonnées de longitude et de latitude sont invalides.' });
+  }
 
-    if (position) {
-      // Si un document existe déjà pour cet utilisateur, mettez-le à jour
-      position.type = 'Point';
-      position.coordinates = [longitude, latitude];
-      position.updatedAt = Date.now();
-    } else {
-      // Si aucun document n'existe pour cet utilisateur, créez-en un nouveau
-      position = new GPSPosition({
+  try {
+    const updatedPosition = await GPSPosition.findOneAndUpdate(
+      { profileId: profileId },
+      {
         uniqueId: id,
         profileId: profileId,
         type: 'Point',
-        coordinates: [longitude, latitude]
-      });
-    }
+        coordinates: [longitude, latitude],
+        updatedAt: Date.now()
+      },
+      { 
+        upsert: true,  // Créer le document s'il n'existe pas, sinon le mettre à jour
+        new: true      // Renvoie le nouveau document mis à jour
+      }
+    );
 
-    await position.save();
-
-    res.json(position);
+    res.json(updatedPosition);
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    console.error("Erreur lors de la mise à jour de la position:", err);
+    res.status(500).json({ message: 'Erreur lors de la mise à jour de la position.' });
   }
 });
+
 
 module.exports = router;
