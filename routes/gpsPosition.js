@@ -1,52 +1,45 @@
 const express = require('express');
 const router = express.Router();
-const User = require("../models/users");
 const GPSPosition = require('../models/gpsPosition');
+const { ObjectId } = require('mongodb');
 
-const { ObjectId } = require('mongodb'); // Ajouter en haut de votre fichier
+// Pour validation
+const isValidCoordinates = (longitude, latitude) => 
+  longitude >= -180 && longitude <= 180 && latitude >= -90 && latitude <= 90;
 
 router.get('/nearby', async (req, res) => {
-  let { longitude, latitude, profileId } = req.query;
+  const { longitude, latitude, profileId } = req.query;
+  
+  // Validation des coordonnées et du profileId
+  if (!longitude || !latitude || !profileId) {
+    return res.status(400).json({ message: 'Longitude, latitude et profileId sont requis.' });
+  }
+  
+  const parsedLongitude = parseFloat(longitude);
+  const parsedLatitude = parseFloat(latitude);
+  
+  if (!isValidCoordinates(parsedLongitude, parsedLatitude)) {
+    return res.status(400).json({ message: 'Coordonnées invalides.' });
+  }
+  
   const profileIdObj = new ObjectId(profileId);
-  console.log("Received profileId:", profileId);
 
-  if (!longitude || !latitude) {
-    return res.status(400).json({ message: 'Les coordonnées de longitude et de latitude sont requises.' });
-  }
-
-  longitude = parseFloat(longitude);
-  latitude = parseFloat(latitude);
-
-  if (
-    isNaN(longitude) || longitude < -180 || longitude > 180 || 
-    isNaN(latitude) || latitude < -90 || latitude > 90
-  ) {
-    return res.status(400).json({ message: 'Les coordonnées de longitude et de latitude sont invalides.' });
-  }
-
-  const thirtyMinutesAgo = new Date(Date.now() - 60 * 1000);
+  const thirtyMinutesAgo = new Date(Date.now() - 30 * 60 * 1000);
 
   try {
     const positions = await GPSPosition.aggregate([
       {
         $geoNear: {
-          near: {
-            type: "Point",
-            coordinates: [longitude, latitude]
-          },
+          near: { type: "Point", coordinates: [parsedLongitude, parsedLatitude] },
           distanceField: "dist.calculated",
-          maxDistance: 30,
+          maxDistance: 30000, // 30km, ajustez selon votre besoin
           spherical: true
         }
       },
       {
         $match: {
-          updatedAt: {
-            $gte: thirtyMinutesAgo
-          },
-          profileId: {
-            $ne: profileIdObj
-          }
+          updatedAt: { $gte: thirtyMinutesAgo },
+          profileId: { $ne: profileIdObj }
         }
       },
       {
@@ -58,6 +51,10 @@ router.get('/nearby', async (req, res) => {
         }
       }
     ]);
+    
+    if (positions.length === 0) {
+      return res.json({ message: "Vous semblez être seul ici." });
+    }
 
     res.json(positions);
   } catch (err) {
@@ -65,45 +62,41 @@ router.get('/nearby', async (req, res) => {
   }
 });
 
-
-
-
-
 router.put('/position/:id/gps', async (req, res) => {
   const { id } = req.params;
   const { longitude, latitude, profileId } = req.body;
 
-  // Validation des coordonnées
-  if (
-    !longitude || !latitude || 
-    isNaN(longitude) || longitude < -180 || longitude > 180 || 
-    isNaN(latitude) || latitude < -90 || latitude > 90
-  ) {
-    return res.status(400).json({ message: 'Les coordonnées de longitude et de latitude sont invalides.' });
+  // Validation des coordonnées et du profileId
+  if (!longitude || !latitude || !profileId) {
+    return res.status(400).json({ message: 'Longitude, latitude et profileId sont requis.' });
+  }
+
+  const parsedLongitude = parseFloat(longitude);
+  const parsedLatitude = parseFloat(latitude);
+
+  if (!isValidCoordinates(parsedLongitude, parsedLatitude)) {
+    return res.status(400).json({ message: 'Coordonnées invalides.' });
   }
 
   try {
-    const updatedPosition = await GPSPosition.findOneAndUpdate(
+    const updatedPosition = {
+      uniqueId: id,
+      profileId: profileId,
+      type: 'Point',
+      coordinates: [parsedLongitude, parsedLatitude],
+      updatedAt: Date.now()
+    };
+
+    const position = await GPSPosition.findOneAndUpdate(
       { profileId: profileId },
-      {
-        uniqueId: id,
-        profileId: profileId,
-        type: 'Point',
-        coordinates: [longitude, latitude],
-        updatedAt: Date.now()
-      },
-      { 
-        upsert: true,  // Créer le document s'il n'existe pas, sinon le mettre à jour
-        new: true      // Renvoie le nouveau document mis à jour
-      }
+      updatedPosition,
+      { upsert: true, new: true }
     );
 
-    res.json(updatedPosition);
+    res.json(position);
   } catch (err) {
-    console.error("Erreur lors de la mise à jour de la position:", err);
-    res.status(500).json({ message: 'Erreur lors de la mise à jour de la position.' });
+    res.status(500).json({ message: err.message });
   }
 });
-
 
 module.exports = router;
