@@ -32,7 +32,7 @@ router.get('/nearby', async (req, res) => {
         $geoNear: {
           near: { type: "Point", coordinates: [parsedLongitude, parsedLatitude] },
           distanceField: "dist.calculated",
-          maxDistance: 30000, // 30km, ajustez selon votre besoin
+          maxDistance: 100,
           spherical: true
         }
       },
