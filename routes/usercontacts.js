@@ -9,7 +9,7 @@ const Profil = require('../models/profils');
 router.post('/addContact', async (req, res) => {
     const { uniqueId, profileId } = req.body;
   console.log(req.body)
-    // Assurez-vous que tous les champs requis sont présents
+//vérification de la présence des champs
     if (!uniqueId || !profileId) {
       return res
         .status(400)
