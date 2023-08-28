@@ -7,60 +7,61 @@ const { ObjectId } = require('mongodb');
 const isValidCoordinates = (longitude, latitude) => 
   longitude >= -180 && longitude <= 180 && latitude >= -90 && latitude <= 90;
 
-router.get('/nearby', async (req, res) => {
-  const { longitude, latitude, profileId } = req.query;
-  
-  // Validation des coordonnées et du profileId
-  if (!longitude || !latitude || !profileId) {
-    return res.status(400).json({ message: 'Longitude, latitude et profileId sont requis.' });
-  }
-  
-  const parsedLongitude = parseFloat(longitude);
-  const parsedLatitude = parseFloat(latitude);
-  
-  if (!isValidCoordinates(parsedLongitude, parsedLatitude)) {
-    return res.status(400).json({ message: 'Coordonnées invalides.' });
-  }
-  
-  const profileIdObj = new ObjectId(profileId);
-
-  const thirtyMinutesAgo = new Date(Date.now() - 30 * 60 * 1000);
-
-  try {
-    const positions = await GPSPosition.aggregate([
-      {
-        $geoNear: {
-          near: { type: "Point", coordinates: [parsedLongitude, parsedLatitude] },
-          distanceField: "dist.calculated",
-          maxDistance: 100,
-          spherical: true
-        }
-      },
-      {
-        $match: {
-          updatedAt: { $gte: thirtyMinutesAgo },
-          profileId: { $ne: profileIdObj }
-        }
-      },
-      {
-        $lookup: {
-          from: "profils",
-          localField: "profileId",
-          foreignField: "_id",
-          as: "profile"
-        }
-      }
-    ]);
+  router.get('/nearby', async (req, res) => {
+    const { longitude, latitude, profileId } = req.query;
     
-    if (positions.length === 0) {
-      return res.json({ message: "Vous semblez être seul ici." });
+    // Validation des coordonnées et du profileId
+    if (!longitude || !latitude || !profileId) {
+      return res.status(400).json({ message: 'Longitude, latitude et profileId sont requis.' });
     }
-
-    res.json(positions);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-});
+    
+    const parsedLongitude = parseFloat(longitude);
+    const parsedLatitude = parseFloat(latitude);
+    
+    if (!isValidCoordinates(parsedLongitude, parsedLatitude)) {
+      return res.status(400).json({ message: 'Coordonnées invalides.' });
+    }
+    
+    //const profileIdObj = new ObjectId(profileId);
+  
+    const thirtyMinutesAgo = new Date(Date.now() - 30 * 60 * 1000);
+  
+    try {
+      const positions = await GPSPosition.aggregate([
+        {
+          $geoNear: {
+            near: { type: "Point", coordinates: [parsedLongitude, parsedLatitude] },
+            distanceField: "dist.calculated",
+            maxDistance: 100,
+            spherical: true
+          }
+        },
+        {
+          $match: {
+            updatedAt: { $gte: thirtyMinutesAgo },
+            
+          }
+        },
+        {
+          $lookup: {
+            from: "profils",
+            localField: "profileId",
+            foreignField: "_id",
+            as: "profile"
+          }
+        }
+      ]);
+      
+      if (positions.length === 0) {
+        return res.json({ message: "Vous semblez être seul ici." });
+      }
+  
+      res.json(positions);
+    } catch (err) {
+      res.status(500).json({ message: err.message });
+    }
+  });
+  
 
 router.put('/position/:id/gps', async (req, res) => {
   const { id } = req.params;
