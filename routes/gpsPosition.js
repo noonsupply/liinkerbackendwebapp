@@ -34,7 +34,7 @@ const isValidCoordinates = (longitude, latitude) =>
         },
         {
           $match: {
-            profileId: { $ne: new ObjectId(profileId) } // Exclure le profileId de l'utilisateur qui fait la recherche
+            profileId: { $ne: new ObjectId(profileId) } //pour exclure le profil de l'utilisateur
           }
         },
         {
