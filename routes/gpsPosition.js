@@ -21,10 +21,6 @@ const isValidCoordinates = (longitude, latitude) =>
     if (!isValidCoordinates(parsedLongitude, parsedLatitude)) {
       return res.status(400).json({ message: 'Coordonnées invalides.' });
     }
-    
-    //const profileIdObj = new ObjectId(profileId);
-  
-    const thirtyMinutesAgo = new Date(Date.now() - 30 * 60 * 1000);
   
     try {
       const positions = await GPSPosition.aggregate([
@@ -38,8 +34,7 @@ const isValidCoordinates = (longitude, latitude) =>
         },
         {
           $match: {
-            updatedAt: { $gte: thirtyMinutesAgo },
-            
+            profileId: { $ne: new ObjectId(profileId) } // Exclure le profileId de l'utilisateur qui fait la recherche
           }
         },
         {
@@ -51,6 +46,7 @@ const isValidCoordinates = (longitude, latitude) =>
           }
         }
       ]);
+      
       
       if (positions.length === 0) {
         return res.json({ message: "Vous semblez être seul ici." });
