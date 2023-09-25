@@ -7,11 +7,24 @@ const { ObjectId } = require("mongodb");
 const isValidCoordinates = (longitude, latitude) =>
   longitude >= -180 && longitude <= 180 && latitude >= -90 && latitude <= 90;
 
+const getAllProfileIdsForUser = async (uniqueId) => {
+  try {
+    const positions = await GPSPosition.find({ uniqueId: uniqueId });
+    return positions.map((position) => position.profileId);
+  } catch (err) {
+    console.error(
+      "Erreur lors de la récupération des profileIds pour uniqueId:",
+      err
+    );
+    throw err; // ou vous pourriez retourner un tableau vide [] si vous préférez gérer les erreurs de cette façon
+  }
+};
+
 router.get("/nearby", async (req, res) => {
-  const { longitude, latitude, profileId } = req.query;
+  const { longitude, latitude, profileId, uniqueId } = req.query;
 
   // Validation des coordonnées et du profileId
-  if (!longitude || !latitude || !profileId) {
+  if (!longitude || !latitude || !profileId || !uniqueId) {
     return res
       .status(400)
       .json({ message: "Longitude, latitude et profileId sont requis." });
@@ -24,9 +37,12 @@ router.get("/nearby", async (req, res) => {
     return res.status(400).json({ message: "Coordonnées invalides." });
   }
 
+  // Récupérez tous les profileIds associés à ce userId
+  const userProfiles = await getAllProfileIdsForUser(uniqueId);
+
   // Calculate the time 30 minutes ago
   const thirtyMinutesAgo = new Date(Date.now() - 30 * 60 * 1000);
-  
+
   try {
     const positions = await GPSPosition.aggregate([
       {
@@ -42,8 +58,8 @@ router.get("/nearby", async (req, res) => {
       },
       {
         $match: {
-          profileId: { $ne: new ObjectId(profileId) }, //pour exclure le profil de l'utilisateur
-          updatedAt: { $gte: thirtyMinutesAgo } 
+          profileId: { $nin: userProfiles }, //pour exclure le profil de l'utilisateur
+          updatedAt: { $gte: thirtyMinutesAgo },
         },
       },
       {
