@@ -24,6 +24,9 @@ router.get("/nearby", async (req, res) => {
     return res.status(400).json({ message: "Coordonnées invalides." });
   }
 
+  // Calculate the time 30 minutes ago
+  const thirtyMinutesAgo = new Date(Date.now() - 30 * 60 * 1000);
+  
   try {
     const positions = await GPSPosition.aggregate([
       {
@@ -40,6 +43,7 @@ router.get("/nearby", async (req, res) => {
       {
         $match: {
           profileId: { $ne: new ObjectId(profileId) }, //pour exclure le profil de l'utilisateur
+          updatedAt: { $gte: thirtyMinutesAgo } 
         },
       },
       {
