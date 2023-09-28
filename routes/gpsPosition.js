@@ -76,7 +76,9 @@ router.get("/nearby", async (req, res) => {
       return res.json({ message: "Vous semblez être seul ici." });
     }
 
-    res.json({ data: positions });
+    const profiles = positions.map(position => position.profile[0]);
+    res.json({ data: profiles });
+
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
