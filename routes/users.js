@@ -112,15 +112,15 @@ router.post("/forgetPassword", async (req, res) => {
 
     const transporter = nodemailer.createTransport({
       host: "smtp.ionos.fr",
-      port: 587, // Ou 465 selon votre configuration
-      secure: false, // true pour 465, false pour les autres ports
+      port: 465, // Ou 465 selon votre configuration
+      secure: true, // true pour 465, false pour les autres ports
       auth: {
         user: process.env.USER_PASS,
         pass: process.env.PASSWORD_USER_PASS,
       },
     });
 
-    const resetLink = `https://yourdomain.com/reset-password?token=${resetToken}`; // Remplacez par votre lien réel
+    const resetLink = `https://liinker.io/reset-password?token=${resetToken}`; // Remplacez par votre lien réel
     const mailOptions = {
       from: process.env.USER_PASS,
       to: user.email,
