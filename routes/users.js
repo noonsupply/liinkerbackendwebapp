@@ -7,7 +7,7 @@ const User = require("../models/users");
 const authMiddleware = require("../middlewares/authMiddleware");
 const ErrorMessages = require("../errors/error_messages");
 const HttpStatus = require("../errors/error_messages");
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 const UserContacts = require("../models/usercontacts");
 const Profile = require("../models/profils");
 const RoomProfiles = require("../models/roomProfiles");
@@ -44,7 +44,7 @@ router.delete("/deleteUser/:uniqueId", async (req, res) => {
 
   const session = await mongoose.startSession();
   session.startTransaction();
-  
+
   try {
     const opts = { session };
 
@@ -72,9 +72,10 @@ router.delete("/deleteUser/:uniqueId", async (req, res) => {
     await session.commitTransaction();
     session.endSession();
 
-    return res.json({ success: true, message: "User and related documents deleted successfully" });
-
-
+    return res.json({
+      success: true,
+      message: "User and related documents deleted successfully",
+    });
   } catch (err) {
     await session.abortTransaction();
     session.endSession();
@@ -82,60 +83,69 @@ router.delete("/deleteUser/:uniqueId", async (req, res) => {
   }
 });
 
-
 /* Change password */
 router.post("/forgetPassword", async (req, res) => {
-  // on veut trouver l'utilisateur dans la base de donnée avec une entree email
   const { email } = req.body;
+
+  // Valider l'email
+  const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+  if (!emailRegex.test(email)) {
+    return res
+      .status(400)
+      .json({ result: false, error: "Invalid email format." });
+  }
+
   try {
     const user = await User.findOne({ email });
-    // si le user n'existe pas on return false ci-dessous
     if (!user) {
-      res
-        .status(404)
-        .json({ result: false, error: ErrorMessages.USER_NOT_FOUND });
+      return res.status(404).json({ result: false, error: "User not found." });
     }
-    //test
-    //sinon on genere un password temporaire
-    const tempPassword = uuidv4().substring(0, 22);
-    //on hash le password temporaire pour la sécurite
-    const hashedPassword = await bcrypt.hash(tempPassword, 10);
-    // on remplace le password du user avec le password temporaire
-    user.password = hashedPassword;
-    // on enregistre en db
+
+    // Générer un token de réinitialisation et enregistrer sa date d'expiration
+    const resetToken = uuidv4();
+    const expirationDate = new Date();
+    expirationDate.setHours(expirationDate.getHours() + 1); // Le token expire dans 1 heure
+
+    user.passwordResetToken = resetToken;
+    user.passwordResetExpires = expirationDate;
     await user.save();
 
-    // on envoie avec nodemailer
     const transporter = nodemailer.createTransport({
-      service: "gmail",
+      host: "smtp.ionos.fr",
+      port: 587, // Ou 465 selon votre configuration
+      secure: false, // true pour 465, false pour les autres ports
       auth: {
-        // adresse email de l'admin
         user: process.env.USER_PASS,
-        pass: process.env.PASWWORD_USER_PASS,
+        pass: process.env.PASSWORD_USER_PASS,
       },
     });
+
+    const resetLink = `https://yourdomain.com/reset-password?token=${resetToken}`; // Remplacez par votre lien réel
     const mailOptions = {
       from: process.env.USER_PASS,
       to: user.email,
       subject: "Password Reset Request",
       text: `You are receiving this email because you (or someone else) have requested the reset of the password for your account.
-Here is your temporary password: ${tempPassword}
-Please use this temporary password to log in and change your password immediately.
-If you did not request this, please contact us and change your password as soon as possible.`,
+Click on this link to reset your password: ${resetLink}
+This link is valid for 1 hour.
+If you did not request this, please contact us.`,
     };
 
     transporter.sendMail(mailOptions, (err, response) => {
       if (err) {
         console.error("Error sending email:", err);
-        res.status(500).json({ result: false, error: "Error sending email." });
+        return res
+          .status(500)
+          .json({ result: false, error: "Error sending email." });
       } else {
-        res
+        return res
           .status(200)
           .json({ result: true, message: "Password reset email sent." });
       }
     });
   } catch (err) {
-    res.status(500).json({ result: false, error: err.message });
+    console.error("Error:", err);
+    return res.status(500).json({ result: false, error: err.message });
   }
 });
 
