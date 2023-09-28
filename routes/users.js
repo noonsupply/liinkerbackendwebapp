@@ -95,18 +95,25 @@ router.post("/forgetPassword", async (req, res) => {
       .json({ result: false, error: "Invalid email format." });
   }
 
+  
+  
+
   try {
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(404).json({ result: false, error: "User not found." });
     }
 
+    const generateCode = () => {
+      return Math.floor(100000 + Math.random() * 900000).toString(); // Génère un code entre 100000 et 999999
+    };
+    
     // Générer un token de réinitialisation et enregistrer sa date d'expiration
-    const resetToken = uuidv4();
+    const resetCode = generateCode();
     const expirationDate = new Date();
     expirationDate.setHours(expirationDate.getHours() + 1); // Le token expire dans 1 heure
 
-    user.passwordResetToken = resetToken;
+    user.passwordResetToken = resetCode;
     user.passwordResetExpires = expirationDate;
     await user.save();
 
@@ -120,16 +127,16 @@ router.post("/forgetPassword", async (req, res) => {
       },
     });
 
-    const resetLink = `https://liinker.io/reset-password?token=${resetToken}`; // Remplacez par votre lien réel
     const mailOptions = {
       from: process.env.USER_PASS,
       to: user.email,
-      subject: "Password Reset Request",
+      subject: "Your Password Reset Code",
       text: `You are receiving this email because you (or someone else) have requested the reset of the password for your account.
-Click on this link to reset your password: ${resetLink}
-This link is valid for 1 hour.
-If you did not request this, please contact us.`,
+    Use this code to reset your password: ${resetCode}
+    This code is valid for 1 hour.
+    If you did not request this, please contact us.`,
     };
+    
 
     transporter.sendMail(mailOptions, (err, response) => {
       if (err) {
@@ -201,5 +208,6 @@ router.get("/userAuth", authMiddleware, async (req, res) => {
       .json({ result: false, message: "Internal server error" });
   }
 });
+
 
 module.exports = router;
