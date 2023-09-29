@@ -156,38 +156,26 @@ router.post("/forgetPassword", async (req, res) => {
 
 // update password user with this rte
 router.post("/changePassword", async (req, res) => {
-  const { email, currentPassword, newPassword } = req.body;
-  // creation d'une rte avec entré user (email, currentPassword and newPassrd)
+  const { email, newPassword } = req.body;
+
   try {
     const user = await User.findOne({ email });
-    // on cherche le user dans la db par le mail
+    
     if (!user) {
-      res.status(404).json({ result: false, error: "User not found!" });
+      return res.status(404).json({ result: false, error: "User not found!" });
     }
 
-    //on verifie si le currentPassword et le user.password sont identique
-    const isPasswordValid = await bcrypt.compare(
-      currentPassword,
-      user.password
-    );
-    //si il ne sont pas identique on return false
-    if (!isPasswordValid) {
-      res
-        .status(400)
-        .json({ result: false, error: "Invalid current password!" });
-    } else {
-      //sinon on crée un nouveau password qu'on enregistre en db et return true
-      const hashedNewPassword = await bcrypt.hash(newPassword, 10);
-      user.password = hashedNewPassword;
-      await user.save();
-      res
-        .status(200)
-        .json({ result: true, message: "Password changed successfully." });
-    }
+    const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+    user.password = hashedNewPassword;
+    await user.save();
+    res.status(200).json({ result: true, message: "Password changed successfully." });
+    
   } catch (err) {
     res.status(500).json({ result: false, error: err.message });
   }
 });
+
+
 
 router.post("/verifyCode", async (req, res) => {
   const { verificationCode, email } = req.body;
