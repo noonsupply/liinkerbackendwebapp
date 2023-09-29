@@ -95,9 +95,6 @@ router.post("/forgetPassword", async (req, res) => {
       .json({ result: false, error: "Invalid email format." });
   }
 
-  
-  
-
   try {
     const user = await User.findOne({ email });
     if (!user) {
@@ -108,13 +105,13 @@ router.post("/forgetPassword", async (req, res) => {
       return Math.floor(100000 + Math.random() * 900000).toString(); // Génère un code entre 100000 et 999999
     };
     
-    // Générer un token de réinitialisation et enregistrer sa date d'expiration
+    // Générer un code de réinitialisation et enregistrer sa date d'expiration
     const resetCode = generateCode();
     const expirationDate = new Date();
-    expirationDate.setHours(expirationDate.getHours() + 1); // Le token expire dans 1 heure
+    expirationDate.setHours(expirationDate.getHours() + 1); // Le code expire dans 1 heure
 
-    user.passwordResetToken = resetCode;
-    user.passwordResetExpires = expirationDate;
+    user.passwordResetCode = resetCode; 
+    user.passwordResetCodeExpires = expirationDate; 
     await user.save();
 
     const transporter = nodemailer.createTransport({
@@ -156,6 +153,7 @@ router.post("/forgetPassword", async (req, res) => {
   }
 });
 
+
 // update password user with this rte
 router.post("/changePassword", async (req, res) => {
   const { email, currentPassword, newPassword } = req.body;
@@ -190,6 +188,45 @@ router.post("/changePassword", async (req, res) => {
     res.status(500).json({ result: false, error: err.message });
   }
 });
+
+router.post("/verifyCode", async (req, res) => {
+  const { verificationCode, email } = req.body;
+
+  // Validation des données reçues
+  if (!verificationCode || !email) {
+    return res.status(400).json({ result: false, error: "Required fields are missing." });
+  }
+
+  try {
+    // Trouver l'utilisateur avec l'email spécifié
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ result: false, error: "User not found." });
+    }
+
+    // Vérifier si le code et le passwordResetCode correspondent
+    if (user.passwordResetCode !== verificationCode) {
+      return res.status(400).json({ result: false, error: "Invalid verification code." });
+    }
+
+    // Vérifier si le code a expiré
+    if (new Date() > user.passwordResetCodeExpires) {
+      // Réinitialiser le code et sa date d'expiration pour des raisons de sécurité
+      user.passwordResetCode = null;
+      user.passwordResetCodeExpires = null;
+      await user.save();
+
+      return res.status(400).json({ result: false, error: "Verification code has expired." });
+    }
+
+    // Si tout est correct, renvoyez un succès
+    return res.status(200).json({ result: true, message: "Verification successful." });
+  } catch (err) {
+    console.error("Error:", err);
+    return res.status(500).json({ result: false, error: err.message });
+  }
+});
+
 
 //route permettant de recuperer les infos d'un user avec le middleware
 router.get("/userAuth", authMiddleware, async (req, res) => {
