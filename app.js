@@ -16,7 +16,8 @@ var roomProfilesRouter = require("./routes/roomProfiles");
 var signupAdminRouter = require("./routes/signupAdmin");
 var signinAdminRouter = require("./routes/signinAdmin");
 var usercontacts = require("./routes/usercontacts");
-var gpsPosition = require("./routes/gpsPosition")
+var gpsPosition = require("./routes/gpsPosition");
+var sharingVcf = require("./routes/sharingVcf");
 
 var app = express();
 const cors = require("cors");
@@ -40,6 +41,7 @@ app.use("/signupAdmin", signupAdminRouter);
 app.use("/signinAdmin", signinAdminRouter);
 app.use("/usercontacts", usercontacts);
 app.use("/gpsPosition", gpsPosition);
+app.use("/sharingVcf", sharingVcf);
 
 
 
