@@ -27,7 +27,8 @@
     "node-fetch": "2",
     "nodemailer": "^6.9.2",
     "uniqid": "^5.4.0",
-    "uuidv4": "^6.2.13"
+    "uuidv4": "^6.2.13",
+    "vcards-js": "^2.10.0"
   },
   "devDependencies": {
     "eslint-config-airbnb-base": "^15.0.0",
