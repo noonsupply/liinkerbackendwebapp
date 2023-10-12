@@ -18,6 +18,7 @@ var signinAdminRouter = require("./routes/signinAdmin");
 var usercontacts = require("./routes/usercontacts");
 var gpsPosition = require("./routes/gpsPosition");
 var sharingVcf = require("./routes/sharingVcf");
+var roles = require("./routes/roles")
 
 var app = express();
 const cors = require("cors");
@@ -42,6 +43,7 @@ app.use("/signinAdmin", signinAdminRouter);
 app.use("/usercontacts", usercontacts);
 app.use("/gpsPosition", gpsPosition);
 app.use("/sharingVcf", sharingVcf);
+app.use("/roles", roles);
 
 
 

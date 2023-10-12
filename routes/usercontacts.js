@@ -52,7 +52,6 @@ router.post('/addContact', async (req, res) => {
       return res.status(500).json({ error: error.message });
     }
   });
-  
 
   router.get('/getContacts/:uniqueId', async (req, res) => {
     const { uniqueId } = req.params;
