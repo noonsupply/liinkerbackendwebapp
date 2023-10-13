@@ -12,22 +12,42 @@ const UserContacts = require("../models/usercontacts");
 const Profile = require("../models/profils");
 const RoomProfiles = require("../models/roomProfiles");
 const Rooms = require("../models/rooms");
+const Profil = require('../models/profils')
+const Role = require('../models/roles')
 
 /* GET users listing. */
 router.get("/", function (req, res, next) {
   res.send("respond with a resource");
 });
-
-/* get All user */
 router.get("/allUser", async (req, res) => {
   try {
     const users = await User.find({});
+
     if (!users || users.length === 0) {
-      return res
-        .status(404)
-        .json({ result: false, error: "Not user in database" });
+      return res.status(404).json({ result: false, error: "Not user in database" });
     }
-    return res.json({ result: true, users });
+
+    // Préparation d'un tableau pour stocker les promesses
+    const usersWithDetailsPromises = users.map(async (user) => {
+      // Compter les profils
+      const profileCount = await Profil.countDocuments({ userId: user._id });
+
+      // Récupérer le rôle
+      const roleDocument = await Role.findOne({ userId: user._id }); // Assurez-vous que Role est le modèle correct pour votre collection de rôles
+      const role = roleDocument ? roleDocument.role : "No role assigned"; // Si aucun rôle n'est trouvé, vous pouvez définir une valeur par défaut
+
+      // Retourne un nouvel objet avec les informations de l'utilisateur, le compte de profil et le rôle
+      return {
+        ...user._doc, // ...user._doc contient toutes les propriétés du document de l'utilisateur
+        profileCount,
+        role, // Ajout du rôle à la réponse
+      };
+    });
+
+    // Attendre que toutes les promesses se résolvent
+    const usersWithDetails = await Promise.all(usersWithDetailsPromises);
+
+    return res.json({ result: true, users: usersWithDetails });
   } catch (err) {
     console.log(err.message);
     return res.status(500).json({
@@ -37,6 +57,8 @@ router.get("/allUser", async (req, res) => {
     });
   }
 });
+
+
 
 /* delete user by uniqueId */
 router.delete("/deleteUser/:uniqueId", async (req, res) => {
