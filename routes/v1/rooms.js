@@ -1,7 +1,7 @@
 const express = require("express");
-const Room = require("../models/rooms");
-const User = require("../models/users");
-const { ErrorMessages, HttpStatus } = require("../errors/error_messages");
+const Room = require("../../models/v1/rooms");
+const User = require("../../models/v1/users");
+const { ErrorMessages, HttpStatus } = require("../../errors/error_messages");
 
 const router = express.Router();
 

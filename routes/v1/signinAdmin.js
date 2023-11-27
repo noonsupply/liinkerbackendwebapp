@@ -1,11 +1,11 @@
 var express = require("express");
 var router = express.Router();
-const { checkBody } = require("../modules/checkBody");
+const { checkBody } = require("../../modules/checkBody");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
-const { ErrorMessages, HttpStatus } = require("../errors/error_messages");
+const { ErrorMessages, HttpStatus } = require("../../errors/error_messages");
 
-const Admin = require("../models/admins");
+const Admin = require("../../models/v1/admins");
 
 router.post("/login", async (req, res) => {
   if (!checkBody(req.body, ["email", "password"])) {

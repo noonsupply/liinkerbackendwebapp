@@ -1,12 +1,12 @@
 var express = require("express");
 var router = express.Router();
-const { checkBody } = require("../modules/checkBody");
+const { checkBody } = require("../../modules/checkBody");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const uuidv4 = require("uuid").v4;
-const { ErrorMessages, HttpStatus } = require("../errors/error_messages");
+const { ErrorMessages, HttpStatus } = require("../../errors/error_messages");
 
-const User = require("../models/users");
+const User = require("../../models/v1/users");
 
 /* creation d'un user with JWT rte signup */
 
@@ -89,6 +89,46 @@ router.post("/addUsername", async (req, res) => {
     return res.json({ result: true, message: "Username added successfully" });
   } catch (err) {
     // Si une erreur se produit pendant la mise à jour de l'utilisateur, renvoyer une réponse d'erreur
+    console.error(err);
+    return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ result: false, error: ErrorMessages.SERVER_ERROR });
+  }
+});
+
+router.post("/registerWebApp", async (req, res) => {
+  const { email, password, firstname, lastname } = req.body;
+
+  if (!checkBody(req.body, ["email", "password", "firstname", "lastname"])) {
+    return res.json({ result: false, error: ErrorMessages.MISSING_FIELDS });
+  }
+
+  try {
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(HttpStatus.BAD_REQUEST).json({ result: false, error: ErrorMessages.USER_EXISTS });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const newUser = new User({
+      email,
+      password: hashedPassword,
+      firstname,
+      lastname,
+      uniqueId: uuidv4(),
+    });
+
+    const savedUser = await newUser.save();
+
+    let token;
+    try {
+      token = jwt.sign({ userId: savedUser._id }, process.env.JWT_SECRET, { expiresIn: "1h" });
+    } catch (err) {
+      console.error(err);
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ result: false, error: ErrorMessages.JWT_ERROR });
+    }
+
+    return res.json({ result: true, user: savedUser, token });
+
+  } catch (err) {
     console.error(err);
     return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ result: false, error: ErrorMessages.SERVER_ERROR });
   }

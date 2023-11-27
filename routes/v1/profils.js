@@ -1,9 +1,9 @@
 var express = require("express");
 var router = express.Router();
-const { ErrorMessages, HttpStatus } = require("../errors/error_messages");
+const { ErrorMessages, HttpStatus } = require("../../errors/error_messages");
 
-const Profil = require("../models/profils");
-const User = require("../models/users");
+const Profil = require("../../models/v1/profils");
+const User = require("../../models/v1/users");
 
 // add une carte de visite a l'utilisateur
 router.post("/addProfil", async (req, res) => {
@@ -67,6 +67,61 @@ router.post("/addProfil", async (req, res) => {
   }
 });
 
+
+router.post("/WebAppAddProfil", async (req, res) => {
+  const {
+    uniqueId,
+    image,
+    title,
+    firstname,
+    lastname,
+    jobTitle,
+    email,
+    website,
+    phone,
+    adress,
+    city,
+    backgroundColor,
+    tags,
+  } = req.body;
+
+  // on pourra recuperer l'erreur si ils y as des champs manquants comme ci-dessous (a completer)
+  if (!uniqueId || !lastname || !firstname) {
+    return res
+      .status(400)
+      .json({ result: false, error: ErrorMessages.MISSING_FIELDS });
+  }
+  try {
+    const user = await User.findOne({ uniqueId });
+    if (!user) {
+      return res
+        .status(400)
+        .json({ result: false, error: ErrorMessages.USER_NOT_FOUND });
+    }
+    const newProfil = new Profil({
+      userId: user._id,
+      image,
+      title,
+      firstname,
+      lastname,
+      jobTitle,
+      email,
+      website,
+      phone,
+      adress,
+      city,
+      backgroundColor,
+      tags,
+    });
+    const saveNewProfil = await newProfil.save();
+    return res.json({ result: true, saveNewProfil });
+  } catch (err) {
+    console.log(err);
+    res
+      .status(500)
+      .json({ result: false, error: HttpStatus.INTERNAL_SERVER_ERROR });
+  }
+});
 //vnm afficher les cards par utilisateur
 router.get("/displayCard/:uniqueId", async (req, res) => {
   const { uniqueId } = req.params;

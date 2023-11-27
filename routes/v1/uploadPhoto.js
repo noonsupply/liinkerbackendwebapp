@@ -1,6 +1,6 @@
 var express = require("express");
 var router = express.Router();
-require("../models/connection");
+require("../../models/v1/connection");
 
 const cloudinary = require("cloudinary").v2;
 const uniqid = require("uniqid");
@@ -46,5 +46,25 @@ router.put("/upload/:token", async (req, res) => {
     fs.unlinkSync(photoPath);
   }
 });
+
+// Récupère toutes les images d'un dossier spécifique sur Cloudinary
+router.get("/getAllImagesFromFolder", async (req, res) => {
+  try {
+    const resultCloudinary = await cloudinary.api.resources({
+      type: 'upload',
+      prefix: 'Liinker/cardBackground/', // chemin du dossier
+      max_results: 100
+    });
+
+    const imageUrls = resultCloudinary.resources.map(image => image.secure_url);
+    res.json({ result: true, images: imageUrls });
+
+  } catch (error) {
+    console.error("Erreur lors de la récupération des images:", error);
+    res.status(500).json({ result: false, message: "Erreur serveur" });
+  }
+});
+
+
 
 module.exports = router;

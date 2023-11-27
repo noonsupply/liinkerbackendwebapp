@@ -1,7 +1,7 @@
 const express = require("express");
-const Role = require("../models/roles"); // Assurez-vous que le chemin d'accès est correct pour votre structure de projet.
-const User = require("../models/users");
-const { ErrorMessages, HttpStatus } = require("../errors/error_messages");
+const Role = require("../../models/v1/roles"); // Assurez-vous que le chemin d'accès est correct pour votre structure de projet.
+const User = require("../../models/v1/users");
+const { ErrorMessages, HttpStatus } = require("../../errors/error_messages");
 
 const router = express.Router();
 

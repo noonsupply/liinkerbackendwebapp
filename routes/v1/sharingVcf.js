@@ -1,7 +1,7 @@
 var express = require("express");
 var router = express.Router();
 const vCard = require('vcards-js');
-const Profil = require("../models/profils");
+const Profil = require("../../models/v1/profils");
 
 router.get("/generateVCard/:profilId", async (req, res) => {
   try {

@@ -1,8 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const UserContact = require('../models/usercontacts');
-const User = require('../models/users');
-const Profil = require('../models/profils');
+const UserContact = require('../../models/v1/usercontacts');
+const User = require('../../models/v1/users');
+const Profil = require('../../models/v1/profils');
+const ProfilNetworkLink = require('../../models/v1/profilNetworkLink');
 
 
 
@@ -83,17 +84,26 @@ router.post('/addContact', async (req, res) => {
   router.get('/getProfil/:profilId', async (req, res) => {
     const { profilId } = req.params;
   
-    try{
+    try {
       var profil = await Profil.findOne({ _id: profilId });
       if (!profil) {
         return res.status(404).json({ error: 'Profil not found' });
       }
+  
+      // Récupérer les liens de réseaux sociaux associés au profil
+      const socialLinks = await ProfilNetworkLink.find({ profileId: profilId });
+      
+  
+      // Ajouter les liens de réseaux sociaux aux données du profil
+      profil = profil.toObject(); // Convertir le document Mongoose en objet simple
+      profil.socialLinks = socialLinks;
   
       return res.status(200).json({ result: true, profil });
     } catch (error) {
       return res.status(500).json({ error: error.message });
     }
   });
+  
   
 
 module.exports = router;

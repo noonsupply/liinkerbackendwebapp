@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const GPSPosition = require("../models/gpsPosition");
+const GPSPosition = require("../../models/v1/gpsPosition");
 const { ObjectId } = require("mongodb");
 
 // Pour validation

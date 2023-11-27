@@ -3,17 +3,17 @@ const nodemailer = require("nodemailer");
 var router = express.Router();
 const uuidv4 = require("uuid").v4;
 const bcrypt = require("bcryptjs");
-const User = require("../models/users");
-const authMiddleware = require("../middlewares/authMiddleware");
-const ErrorMessages = require("../errors/error_messages");
-const HttpStatus = require("../errors/error_messages");
+const User = require("../../models/v1/users");
+const authMiddleware = require("../../middlewares/authMiddleware");
+const ErrorMessages = require("../../errors/error_messages");
+const HttpStatus = require("../../errors/error_messages");
 const mongoose = require("mongoose");
-const UserContacts = require("../models/usercontacts");
-const Profile = require("../models/profils");
-const RoomProfiles = require("../models/roomProfiles");
-const Rooms = require("../models/rooms");
-const Profil = require('../models/profils')
-const Role = require('../models/roles')
+const UserContacts = require("../../models/v1/usercontacts");
+const Profile = require("../../models/v1/profils");
+const RoomProfiles = require("../../models/v1/roomProfiles");
+const Rooms = require("../../models/v1/rooms");
+const Profil = require('../../models/v1/profils')
+const Role = require('../../models/v1/roles')
 
 /* GET users listing. */
 router.get("/", function (req, res, next) {
@@ -58,8 +58,6 @@ router.get("/allUser", async (req, res) => {
   }
 });
 
-
-
 /* delete user by uniqueId */
 router.delete("/deleteUser/:uniqueId", async (req, res) => {
   const { uniqueId } = req.params;
@@ -73,6 +71,8 @@ router.delete("/deleteUser/:uniqueId", async (req, res) => {
     // Recherchez l'utilisateur par son uniqueId
     const existingUser = await User.findOne({ uniqueId });
     if (!existingUser) {
+      await session.abortTransaction();
+      session.endSession();
       return res.status(404).json({ result: false, error: "User not found" });
     }
 
@@ -82,8 +82,10 @@ router.delete("/deleteUser/:uniqueId", async (req, res) => {
     // Supprimez les contacts de l'utilisateur
     await UserContacts.deleteOne({ userId: existingUser._id }, opts);
 
-    // Supprimez le profil de l'utilisateur
-    await Profile.deleteOne({ userId: existingUser._id }, opts);
+    // Ici, vous supprimez les profils associés à l'utilisateur. 
+    // Assurez-vous que le nom de la collection est correct, dans votre code précédent, 
+    // c'était "Profil", donc je vais utiliser ce nom.
+    await Profil.deleteMany({ userId: existingUser._id }, opts);
 
     // Supprimez le profil de la salle de l'utilisateur
     await RoomProfiles.deleteMany({ userId: existingUser._id }, opts);
@@ -104,6 +106,7 @@ router.delete("/deleteUser/:uniqueId", async (req, res) => {
     return res.status(500).json({ result: false, error: err.message });
   }
 });
+
 
 /* Change password */
 router.post("/forgetPassword", async (req, res) => {
@@ -248,6 +251,35 @@ router.get("/userAuth", authMiddleware, async (req, res) => {
       return res.status(404).json({ result: false, message: "User not found" });
     }
     return res.status(200).json({ result: true, user: existingUser });
+  } catch (err) {
+    console.error(err); // Log the error for debugging
+    return res
+      .status(500)
+      .json({ result: false, message: "Internal server error" });
+  }
+});
+
+router.put("/profilUpdate", authMiddleware, async (req, res) => {
+  const userId = req.body.userId;
+  const firstname = req.body.firstname;
+  const lastname = req.body.lastname;
+  const email = req.body.email;
+  const language = req.body.language;
+
+  try {
+    const existingUser = await User.findById(userId);
+    if (!existingUser) {
+      return res.status(404).json({ result: false, message: "User not found" });
+    }
+
+    existingUser.firstname = firstname;
+    existingUser.lastname = lastname;
+    existingUser.email = email;
+    existingUser.language = language;
+
+    const updatedUser = await existingUser.save();
+
+    return res.status(200).json({ result: true, user: updatedUser });
   } catch (err) {
     console.error(err); // Log the error for debugging
     return res
