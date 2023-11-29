@@ -9,7 +9,8 @@ const User = require("../../models/v1/users");
 router.post("/addProfil", async (req, res) => {
   const {
     uniqueId,
-    image,
+    profilImage,
+    companyLogo,
     title,
     firstname,
     lastname,
@@ -19,10 +20,9 @@ router.post("/addProfil", async (req, res) => {
     phone,
     adress,
     city,
-    linkedin,
-    snapchat,
-    instagram,
-    backgroundColor,
+    country,
+    postalCode,
+    backgroundImage,
     tags,
   } = req.body;
 
@@ -41,7 +41,8 @@ router.post("/addProfil", async (req, res) => {
     }
     const newProfil = new Profil({
       userId: user._id,
-      image,
+      profilImage,
+      companyLogo,
       title,
       firstname,
       lastname,
@@ -51,10 +52,9 @@ router.post("/addProfil", async (req, res) => {
       phone,
       adress,
       city,
-      linkedin,
-      snapchat,
-      instagram,
-      backgroundColor,
+      country,
+      postalCode,
+      backgroundImage,
       tags,
     });
     const saveNewProfil = await newProfil.save();
@@ -71,18 +71,21 @@ router.post("/addProfil", async (req, res) => {
 router.post("/WebAppAddProfil", async (req, res) => {
   const {
     uniqueId,
-    image,
-    title,
-    firstname,
-    lastname,
-    jobTitle,
-    email,
-    website,
-    phone,
-    adress,
-    city,
-    backgroundColor,
-    tags,
+    profilImage,
+      companyLogo,
+      title,
+      firstname,
+      lastname,
+      jobTitle,
+      email,
+      website,
+      phone,
+      adress,
+      city,
+      country,
+      postalCode,
+      backgroundImage,
+      tags,
   } = req.body;
 
   // on pourra recuperer l'erreur si ils y as des champs manquants comme ci-dessous (a completer)
@@ -100,7 +103,8 @@ router.post("/WebAppAddProfil", async (req, res) => {
     }
     const newProfil = new Profil({
       userId: user._id,
-      image,
+      profilImage,
+      companyLogo,
       title,
       firstname,
       lastname,
@@ -110,7 +114,9 @@ router.post("/WebAppAddProfil", async (req, res) => {
       phone,
       adress,
       city,
-      backgroundColor,
+      country,
+      postalCode,
+      backgroundImage,
       tags,
     });
     const saveNewProfil = await newProfil.save();
@@ -151,21 +157,21 @@ router.get("/displayCard/:uniqueId", async (req, res) => {
 router.put("/updateCard/:uniqueId/:profilId", async (req, res) => {
   const { uniqueId, profilId } = req.params;
   const {
-    image,
-    title,
-    firstname,
-    lastname,
-    jobTitle,
-    email,
-    website,
-    phone,
-    adress,
-    city,
-    linkedin,
-    snapchat,
-    instagram,
-    backgroundColor,
-    tags,
+    profilImage,
+      companyLogo,
+      title,
+      firstname,
+      lastname,
+      jobTitle,
+      email,
+      website,
+      phone,
+      adress,
+      city,
+      country,
+      postalCode,
+      backgroundImage,
+      tags,
   } = req.body;
   try {
     const user = await User.findOne({ uniqueId });
@@ -183,21 +189,21 @@ router.put("/updateCard/:uniqueId/:profilId", async (req, res) => {
     const cardUpdate = await Profil.findOneAndUpdate(
       { userId: user._id, _id: profilId},
       {
-        image,
-        title,
-        firstname,
-        lastname,
-        jobTitle,
-        email,
-        website,
-        phone,
-        adress,
-        city,
-        linkedin,
-        snapchat,
-        instagram,
-        backgroundColor,
-        tags,
+        profilImage,
+      companyLogo,
+      title,
+      firstname,
+      lastname,
+      jobTitle,
+      email,
+      website,
+      phone,
+      adress,
+      city,
+      country,
+      postalCode,
+      backgroundImage,
+      tags,
       },
       {
         new: true,
