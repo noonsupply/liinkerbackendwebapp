@@ -10,7 +10,6 @@ const profilSchema = new mongoose.Schema({
   backgroundImage: { type: String },
   profilImage: {type: String, trim: true},
   companyLogo: {type: String},
-  title: { type: String, trim: true, set: v => v.replace(/\s+/g, '').toLowerCase() },
   firstname: { type: String, trim: true, set: v => v.replace(/\s+/g, '').toLowerCase() },
   lastname: { type: String, trim: true, set: v => v.replace(/\s+/g, '').toLowerCase() },
   jobTitle: { type: String, trim: true, set: v => v.replace(/\s+/g, '').toLowerCase() },

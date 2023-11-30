@@ -11,7 +11,6 @@ router.post("/addProfil", async (req, res) => {
     uniqueId,
     profilImage,
     companyLogo,
-    title,
     firstname,
     lastname,
     jobTitle,
@@ -43,7 +42,6 @@ router.post("/addProfil", async (req, res) => {
       userId: user._id,
       profilImage,
       companyLogo,
-      title,
       firstname,
       lastname,
       jobTitle,
@@ -73,7 +71,6 @@ router.post("/WebAppAddProfil", async (req, res) => {
     uniqueId,
     profilImage,
       companyLogo,
-      title,
       firstname,
       lastname,
       jobTitle,
@@ -105,7 +102,6 @@ router.post("/WebAppAddProfil", async (req, res) => {
       userId: user._id,
       profilImage,
       companyLogo,
-      title,
       firstname,
       lastname,
       jobTitle,
@@ -159,7 +155,6 @@ router.put("/updateCard/:uniqueId/:profilId", async (req, res) => {
   const {
     profilImage,
       companyLogo,
-      title,
       firstname,
       lastname,
       jobTitle,
@@ -170,6 +165,7 @@ router.put("/updateCard/:uniqueId/:profilId", async (req, res) => {
       city,
       country,
       postalCode,
+      companyName,
       backgroundImage,
       tags,
   } = req.body;
@@ -191,7 +187,6 @@ router.put("/updateCard/:uniqueId/:profilId", async (req, res) => {
       {
         profilImage,
       companyLogo,
-      title,
       firstname,
       lastname,
       jobTitle,
@@ -203,6 +198,7 @@ router.put("/updateCard/:uniqueId/:profilId", async (req, res) => {
       country,
       postalCode,
       backgroundImage,
+      companyName,
       tags,
       },
       {
