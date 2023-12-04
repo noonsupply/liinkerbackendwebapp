@@ -7,22 +7,24 @@ const User = require("../../models/v1/users");
 
 // Ajouter une carte de visite à l'utilisateur
 router.post("/addProfil", async (req, res) => {
-  // Extraction des champs nécessaires du corps de la requête
   const { uniqueId, networkLinks, ...otherFields } = req.body;
 
-  // Validation des champs requis
+  console.log("bckend Profils", uniqueId, otherFields)
+
   if (!uniqueId || !otherFields.lastname || !otherFields.firstname) {
     return res.status(400).json({ result: false, error: ErrorMessages.MISSING_FIELDS });
   }
 
   try {
+    // Trouver l'utilisateur correspondant à l'uniqueId
     const user = await User.findOne({ uniqueId });
     if (!user) {
       return res.status(400).json({ result: false, error: ErrorMessages.USER_NOT_FOUND });
     }
 
+    // Créer un nouveau profil avec l'ObjectId de l'utilisateur
     const newProfil = new Profil({
-      userId: user._id,
+      userId: user._id, // Utiliser l'ObjectId de l'utilisateur ici
       networkLinks,
       ...otherFields
     });
@@ -34,6 +36,7 @@ router.post("/addProfil", async (req, res) => {
     res.status(500).json({ result: false, error: HttpStatus.INTERNAL_SERVER_ERROR });
   }
 });
+
 
 // Afficher les cartes par utilisateur
 router.get("/displayCard/:uniqueId", async (req, res) => {
