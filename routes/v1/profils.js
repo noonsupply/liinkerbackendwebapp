@@ -24,7 +24,7 @@ router.post("/addProfil", async (req, res) => {
 
     // Créer un nouveau profil avec l'ObjectId de l'utilisateur
     const newProfil = new Profil({
-      userId: user._id, // Utiliser l'ObjectId de l'utilisateur ici
+      userId: user._id,
       networkLinks,
       ...otherFields
     });
