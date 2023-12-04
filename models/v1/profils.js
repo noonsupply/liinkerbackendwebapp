@@ -1,6 +1,13 @@
 const mongoose = require("mongoose");
 const { parsePhoneNumberFromString } = require('libphonenumber-js');
 
+const profilNetworkLinkSchema = new mongoose.Schema({
+  networkName: { type: String, required: true, trim: true },
+  linkUrl: { type: String, required: true, trim: true },
+  addedAt: { type: Date, default: Date.now },
+  updatedAt: { type: Date, default: null },
+});
+
 const profilSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
@@ -35,8 +42,12 @@ const profilSchema = new mongoose.Schema({
   tags: {
     type: [String],
     set: v => v.map(tag => tag.trim())
-  }
-  
+  },
+  createdAt: { type: Date, default: Date.now },
+  updatedAt: { type: Date, default: Date.now },
+  isDeleted: { type: Boolean, default: false },
+  isPublic: { type: Boolean, default: false },  
+  networkLinks: [profilNetworkLinkSchema],
   // trim supprime les espaces inutiles  avant et aprés la chaine de caractere
 });
 

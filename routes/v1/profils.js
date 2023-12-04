@@ -5,322 +5,137 @@ const { ErrorMessages, HttpStatus } = require("../../errors/error_messages");
 const Profil = require("../../models/v1/profils");
 const User = require("../../models/v1/users");
 
-// add une carte de visite a l'utilisateur
+// Ajouter une carte de visite à l'utilisateur
 router.post("/addProfil", async (req, res) => {
-  const {
-    uniqueId,
-    profilImage,
-    companyLogo,
-    firstname,
-    lastname,
-    jobTitle,
-    email,
-    website,
-    phone,
-    adress,
-    city,
-    country,
-    postalCode,
-    backgroundImage,
-    tags,
-  } = req.body;
+  // Extraction des champs nécessaires du corps de la requête
+  const { uniqueId, networkLinks, ...otherFields } = req.body;
 
-  // on pourra recuperer l'erreur si ils y as des champs manquants comme ci-dessous (a completer)
-  if (!uniqueId || !lastname || !firstname) {
-    return res
-      .status(400)
-      .json({ result: false, error: ErrorMessages.MISSING_FIELDS });
+  // Validation des champs requis
+  if (!uniqueId || !otherFields.lastname || !otherFields.firstname) {
+    return res.status(400).json({ result: false, error: ErrorMessages.MISSING_FIELDS });
   }
+
   try {
     const user = await User.findOne({ uniqueId });
     if (!user) {
-      return res
-        .status(400)
-        .json({ result: false, error: ErrorMessages.USER_NOT_FOUND });
+      return res.status(400).json({ result: false, error: ErrorMessages.USER_NOT_FOUND });
     }
+
     const newProfil = new Profil({
       userId: user._id,
-      profilImage,
-      companyLogo,
-      firstname,
-      lastname,
-      jobTitle,
-      email,
-      website,
-      phone,
-      adress,
-      city,
-      country,
-      postalCode,
-      backgroundImage,
-      tags,
+      networkLinks,
+      ...otherFields
     });
-    const saveNewProfil = await newProfil.save();
-    return res.json({ result: true, saveNewProfil });
+
+    const savedProfil = await newProfil.save();
+    return res.json({ result: true, savedProfil });
   } catch (err) {
-    console.log(err);
-    res
-      .status(500)
-      .json({ result: false, error: HttpStatus.INTERNAL_SERVER_ERROR });
+    console.error(err);
+    res.status(500).json({ result: false, error: HttpStatus.INTERNAL_SERVER_ERROR });
   }
 });
 
-
-router.post("/WebAppAddProfil", async (req, res) => {
-  const {
-    uniqueId,
-    profilImage,
-      companyLogo,
-      firstname,
-      lastname,
-      jobTitle,
-      email,
-      website,
-      phone,
-      adress,
-      city,
-      country,
-      postalCode,
-      backgroundImage,
-      tags,
-  } = req.body;
-
-  // on pourra recuperer l'erreur si ils y as des champs manquants comme ci-dessous (a completer)
-  if (!uniqueId || !lastname || !firstname) {
-    return res
-      .status(400)
-      .json({ result: false, error: ErrorMessages.MISSING_FIELDS });
-  }
-  try {
-    const user = await User.findOne({ uniqueId });
-    if (!user) {
-      return res
-        .status(400)
-        .json({ result: false, error: ErrorMessages.USER_NOT_FOUND });
-    }
-    const newProfil = new Profil({
-      userId: user._id,
-      profilImage,
-      companyLogo,
-      firstname,
-      lastname,
-      jobTitle,
-      email,
-      website,
-      phone,
-      adress,
-      city,
-      country,
-      postalCode,
-      backgroundImage,
-      tags,
-    });
-    const saveNewProfil = await newProfil.save();
-    return res.json({ result: true, saveNewProfil });
-  } catch (err) {
-    console.log(err);
-    res
-      .status(500)
-      .json({ result: false, error: HttpStatus.INTERNAL_SERVER_ERROR });
-  }
-});
-//vnm afficher les cards par utilisateur
+// Afficher les cartes par utilisateur
 router.get("/displayCard/:uniqueId", async (req, res) => {
   const { uniqueId } = req.params;
+
   try {
     const user = await User.findOne({ uniqueId });
     if (!user) {
-      return res
-        .status(400)
-        .json({ result: false, error: ErrorMessages.USER_NOT_FOUND });
+      return res.status(400).json({ result: false, error: ErrorMessages.USER_NOT_FOUND });
     }
-    const cards = await Profil.find({ userId: user._id });
-    if (!cards || cards.length === 0) {
-      return res
-        .status(400)
-        .json({ result: false, error: ErrorMessages.NOT_CARD_FOR_USER });
+
+    const profiles = await Profil.find({ userId: user._id });
+    if (!profiles.length) {
+      return res.status(400).json({ result: false, error: ErrorMessages.NOT_CARD_FOR_USER });
     }
-    return res.json({ result: true, cards });
+
+    return res.json({ result: true, profiles });
   } catch (err) {
-    console.log(err);
-    res
-      .status(500)
-      .json({ result: false, error: HttpStatus.INTERNAL_SERVER_ERROR });
+    console.error(err);
+    res.status(500).json({ result: false, error: HttpStatus.INTERNAL_SERVER_ERROR });
   }
 });
 
-//Modifier les cards
+// Modifier une carte
 router.put("/updateCard/:uniqueId/:profilId", async (req, res) => {
   const { uniqueId, profilId } = req.params;
-  const {
-    profilImage,
-      companyLogo,
-      firstname,
-      lastname,
-      jobTitle,
-      email,
-      website,
-      phone,
-      adress,
-      city,
-      country,
-      postalCode,
-      companyName,
-      backgroundImage,
-      tags,
-  } = req.body;
+  const updateFields = req.body;
+
   try {
     const user = await User.findOne({ uniqueId });
     if (!user) {
-      return res
-        .status(400)
-        .json({ result: false, error: ErrorMessages.USER_NOT_FOUND });
+      return res.status(400).json({ result: false, error: ErrorMessages.USER_NOT_FOUND });
     }
-    const card = await Profil.findOne({ userId: user._id, _id: profilId  });
-    if (!card) {
-      return res
-        .status(400)
-        .json({ result: false, error: ErrorMessages.NOT_CARD_FOR_USER });
-    }
-    const cardUpdate = await Profil.findOneAndUpdate(
-      { userId: user._id, _id: profilId},
-      {
-        profilImage,
-      companyLogo,
-      firstname,
-      lastname,
-      jobTitle,
-      email,
-      website,
-      phone,
-      adress,
-      city,
-      country,
-      postalCode,
-      backgroundImage,
-      companyName,
-      tags,
-      },
-      {
-        new: true,
-        runValidators: true,
-      }
+
+    const updatedProfil = await Profil.findOneAndUpdate(
+      { userId: user._id, _id: profilId },
+      { $set: updateFields },
+      { new: true, runValidators: true }
     );
-    if (!cardUpdate) {
-      return res
-        .status(400)
-        .json({ result: false, error: ErrorMessages.NOT_CARD_FOR_USER });
+
+    if (!updatedProfil) {
+      return res.status(400).json({ result: false, error: ErrorMessages.NOT_CARD_FOR_USER });
     }
-    return res.status(200).json({
-      result: true,
-      data: cardUpdate,
-    });
+
+    return res.json({ result: true, updatedProfil });
   } catch (error) {
-    return res.status(400).json({
-      result: false,
-      error: ErrorMessages.NOT_CARD_FOR_USER,
-    });
+    console.error(error);
+    return res.status(500).json({ result: false, error: HttpStatus.INTERNAL_SERVER_ERROR });
   }
 });
 
 // Supprimer une carte de visite
-// router.delete("/deleteCard/:uniqueId", async (req, res) => {
-//   const { uniqueId } = req.params;
-//   try {
-//     const user = await User.findOne({ uniqueId });
-//     if (!user) {
-//       return res
-//         .status(400)
-//         .json({ result: false, error: ErrorMessages.USER_NOT_FOUND });
-//     }
-
-//     const card = await Profil.findOne({ userId: user._id });
-//     if (!card) {
-//       return res
-//         .status(400)
-//         .json({ result: false, error: ErrorMessages.NOT_CARD_FOR_USER });
-//     }
-
-//     await Profil.findOneAndDelete({ userId: user._id });
-
-//     return res.status(200).json({
-//       result: true,
-//       message: "Card deleted successfully",
-//     });
-//   } catch (error) {
-//     return res.status(500).json({
-//       result: false,
-//       error: HttpStatus.INTERNAL_SERVER_ERROR,
-//     });
-//   }
-// });
-
 router.delete("/deleteCard/:uniqueId/:profilId", async (req, res) => {
   const { uniqueId, profilId } = req.params;
+
   try {
     const user = await User.findOne({ uniqueId });
     if (!user) {
-      return res
-        .status(400)
-        .json({ result: false, error: ErrorMessages.USER_NOT_FOUND });
+      return res.status(400).json({ result: false, error: ErrorMessages.USER_NOT_FOUND });
     }
 
-    const card = await Profil.findOne({ _id: profilId });
-    if (!card) {
-      return res
-        .status(400)
-        .json({ result: false, error: ErrorMessages.NOT_CARD_FOR_USER });
+    const deletedProfil = await Profil.findOneAndDelete({ _id: profilId, userId: user._id });
+    if (!deletedProfil) {
+      return res.status(400).json({ result: false, error: ErrorMessages.NOT_CARD_FOR_USER });
     }
 
-    await Profil.deleteOne({ _id: profilId });
-
-    return res.status(200).json({
-      result: true,
-      message: "Card deleted successfully",
-    });
+    return res.json({ result: true, message: "Card deleted successfully" });
   } catch (error) {
-    console.error(error.message);
-    return res.status(500).json({
-      result: false,
-      error: error,
-    });
+    console.error(error);
+    return res.status(500).json({ result: false, error: HttpStatus.INTERNAL_SERVER_ERROR });
   }
 });
 
-// Get all detail from one cardId
+// Obtenir les détails d'une carte
 router.get("/getCardDetail/:profilId", async (req, res) => {
+  const { profilId } = req.params;
+
   try {
-    // get the profile by id and populate with other details like owner name etc..
-    const profile = await Profil.findOne({ _id: req.params.profilId }).populate("userId");
-    
+    const profile = await Profil.findById(profilId).populate("userId");
     if (!profile) {
-      return res.status(400).json({ error: ErrorMessages.NOT_CARD_FOR_USER });
+      return res.status(400).json({ result: false, error: ErrorMessages.NOT_CARD_FOR_USER });
     }
-    
-    return res.status(200).json(profile);
+
+    return res.json({ result: true, profile });
   } catch (error) {
-    console.error(error.message);
-    return res.status(500).json({ error: error });
+    console.error(error);
+    return res.status(500).json({ result: false, error: HttpStatus.INTERNAL_SERVER_ERROR });
   }
 });
 
-
-
-//display all cards
+// Afficher toutes les cartes
 router.get("/displayAllCards", async (req, res) => {
   try {
-    const cards = await Profil.find();
-    if (!cards || cards.length === 0) {
-      return res
-        .status(400)
-        .json({ result: false, error: ErrorMessages.NOT_CARD_FOR_USER });
+    const profiles = await Profil.find();
+    if (!profiles.length) {
+      return res.status(400).json({ result: false, error: ErrorMessages.NOT_CARD_FOR_USER });
     }
-    return res.json({ result: true, cards });
+
+    return res.json({ result: true, profiles });
   } catch (err) {
-    console.log(err);
-    res
-      .status(500)
-      .json({ result: false, error: HttpStatus.INTERNAL_SERVER_ERROR });
+    console.error(err);
+    res.status(500).json({ result: false, error: HttpStatus.INTERNAL_SERVER_ERROR });
   }
 });
 
