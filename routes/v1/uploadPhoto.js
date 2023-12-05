@@ -47,6 +47,37 @@ router.put("/upload/:token", async (req, res) => {
   }
 });
 
+
+router.put("/uploadCompanyLogo/:uniqueId", async (req, res) => {
+  const photoPath = `./tmp/${uniqid()}.jpg`;
+  console.log("req.file", req.files.userPhoto);
+
+  const resultMove = await req.files.userPhoto.mv(photoPath);
+  console.log("resultMove", resultMove);
+
+  if (!resultMove) {
+    // Ajout de l'option 'folder'
+    const resultCloudinary = await cloudinary.uploader.upload(photoPath, {
+      folder: 'Liinker/profileImages'
+    });
+
+    User.findOneAndUpdate(
+      { uniqueId: req.params.uniqueId },
+      { $set: { profilImage: resultCloudinary.secure_url } },
+      { new: true }
+    ).then((updatedUser) => {
+      if (!updatedUser) {
+        res.json({ error: "User not found" });
+      } else {
+        res.json({ result: true, user: updatedUser });
+      }
+    });
+
+    fs.unlinkSync(photoPath);
+  }
+});
+
+
 // Récupère toutes les images d'un dossier spécifique sur Cloudinary
 router.get("/getAllImagesFromFolder", async (req, res) => {
   try {
