@@ -27,7 +27,7 @@ const profilSchema = new mongoose.Schema({
     trim: true,
     validate: {
       validator: function(v) {
-        const phoneNumber = parsePhoneNumberFromString(v);
+        const phoneNumber = parsePhoneNumberFromString(v, 'FR');
         return phoneNumber ? phoneNumber.isValid() : false;
       },
       message: props => `${props.value} n'est pas un numéro de téléphone valide!`
