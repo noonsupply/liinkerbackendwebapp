@@ -19,7 +19,7 @@ const profilSchema = new mongoose.Schema({
   companyLogo: {type: String},
   firstname: { type: String, trim: true, set: v => v.replace(/\s+/g, '').toLowerCase() },
   lastname: { type: String, trim: true, set: v => v.replace(/\s+/g, '').toLowerCase() },
-  jobTitle: { type: String, trim: true, set: v => v.replace(/\s+/g, '').toLowerCase() },
+  jobTitle: { type: String, set: v => v.replace(/\s+/g, '').toLowerCase() },
   email: { type: String, trim: true, set: v => v.replace(/\s+/g, '').toLowerCase() },
   website: { type: String, trim: true, set: v => v.replace(/\s+/g, '').toLowerCase() },
   phone: {
@@ -34,8 +34,8 @@ const profilSchema = new mongoose.Schema({
     },
     required: [true, 'Le numéro de téléphone est requis']
   },
-  address: { type: String, trim: true, set: v => v.replace(/\s+/g, '').toLowerCase() },
-  city: { type: String, trim: true, set: v => v.replace(/\s+/g, '').toLowerCase() },
+  address: { type: String, set: v => v.replace(/\s+/g, '').toLowerCase() },
+  city: { type: String, set: v => v.replace(/\s+/g, '').toLowerCase() },
   country: { type: String, trim: true, set: v => v.replace(/\s+/g, '').toLowerCase() },
   postalCode: { type: String, trim: true },
   companyName : {type: String, trim: true, set: v => v.replace(/\s+/g, '').toLowerCase()},

@@ -96,6 +96,62 @@ router.get("/getAllImagesFromFolder", async (req, res) => {
   }
 });
 
+router.put("/uploadProfilImage/:uniqueId", async (req, res) => {
+  const photoPath = `./tmp/${uniqid()}.jpg`;
+  console.log("req.file", req.files.profilImage);
+
+  const resultMove = await req.files.profilImage.mv(photoPath);
+  console.log("resultMove", resultMove);
+
+  if (!resultMove) {
+    const resultCloudinary = await cloudinary.uploader.upload(photoPath, {
+      folder: 'Liinker/profileImages'
+    });
+
+    User.findOneAndUpdate(
+      { uniqueId: req.params.uniqueId },
+      { $set: { profilImage: resultCloudinary.secure_url } },
+      { new: true }
+    ).then((updatedUser) => {
+      if (!updatedUser) {
+        res.json({ error: "User not found" });
+      } else {
+        res.json({ result: true, user: updatedUser });
+      }
+    });
+
+    fs.unlinkSync(photoPath);
+  }
+});
+
+router.put("/uploadCompanyLogo/:uniqueId", async (req, res) => {
+  const photoPath = `./tmp/${uniqid()}.jpg`;
+  console.log("req.file", req.files.companyLogo);
+
+  const resultMove = await req.files.companyLogo.mv(photoPath);
+  console.log("resultMove", resultMove);
+
+  if (!resultMove) {
+    const resultCloudinary = await cloudinary.uploader.upload(photoPath, {
+      folder: 'Liinker/companyLogos'
+    });
+
+    User.findOneAndUpdate(
+      { uniqueId: req.params.uniqueId },
+      { $set: { companyLogo: resultCloudinary.secure_url } },
+      { new: true }
+    ).then((updatedUser) => {
+      if (!updatedUser) {
+        res.json({ error: "User not found" });
+      } else {
+        res.json({ result: true, user: updatedUser });
+      }
+    });
+
+    fs.unlinkSync(photoPath);
+  }
+});
+
 
 
 module.exports = router;
