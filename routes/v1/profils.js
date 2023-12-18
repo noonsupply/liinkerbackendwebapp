@@ -167,6 +167,21 @@ router.put("/updateProfilPublic/:profilId", async (req, res) => {
 }
 );
 
+router.get("/displayPublicCards", async (req, res) => {
+  try {
+    const profiles = await Profil.find({ isPublic: true });
+    if (!profiles.length) {
+      return res.status(400).json({ result: false, error: ErrorMessages.NOT_CARD_FOR_USER });
+    }
+
+    return res.json({ result: true, profiles });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ result: false, error: HttpStatus.INTERNAL_SERVER_ERROR });
+  }
+}
+);
+
 
 
 module.exports = router;
