@@ -19,7 +19,7 @@ const profilSchema = new mongoose.Schema({
   companyLogo: {type: String},
   firstname: { type: String, trim: true, set: v => v.toLowerCase() },
   lastname: { type: String, trim: true, set: v => v.toLowerCase() },
-  jobTitle: { type: String, set: v => v.toLowerCase() },
+  publicationName: { type: String, set: v => v.toLowerCase() },
   email: { type: String, trim: true, set: v => v.toLowerCase() },
   website: { type: String, trim: true, set: v => v.toLowerCase() },
   phone: { type: String, trim: true},
@@ -28,6 +28,7 @@ const profilSchema = new mongoose.Schema({
   country: { type: String, trim: true, set: v => v.toLowerCase() },
   postalCode: { type: String, trim: true },
   companyName : {type: String, trim: true, set: v => v.toLowerCase() },
+  companyType: { type: String, trim: true, set: v => v.toLowerCase() },
   description: { type: String, set: v => v.toLowerCase() },
   tags: {
     type: [String],
