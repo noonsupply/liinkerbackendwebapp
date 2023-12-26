@@ -28,8 +28,8 @@ const profilSchema = new mongoose.Schema({
   country: { type: String, trim: true, set: v => v.toLowerCase() },
   postalCode: { type: String, trim: true },
   companyName : {type: String, trim: true, set: v => v.toLowerCase() },
-  companyType: { type: String, trim: true, set: v => v.toLowerCase() },
-  description: { type: String, set: v => v.toLowerCase() },
+  businessType: { type: String, trim: true, set: v => v.toLowerCase() },
+  description: { type: String, set: v => v.toLowerCase(), required: true },
   tags: {
     type: [String],
     set: v => v.map(tag => tag.trim())

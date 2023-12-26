@@ -9,8 +9,6 @@ const User = require("../../models/v1/users");
 router.post("/addProfil", async (req, res) => {
   const { uniqueId, networkLinks, ...otherFields } = req.body;
 
-  console.log("bckend Profils", uniqueId, otherFields)
-
   if (!uniqueId || !otherFields.lastname || !otherFields.firstname) {
     return res.status(400).json({ result: false, error: ErrorMessages.MISSING_FIELDS });
   }
@@ -32,6 +30,10 @@ router.post("/addProfil", async (req, res) => {
     const savedProfil = await newProfil.save();
     return res.json({ result: true, savedProfil });
   } catch (err) {
+    if (err.name === 'ValidationError') {
+      // Renvoie un message d'erreur personnalisé pour les erreurs de validation
+      return res.status(400).json({ result: false, error: err.message });
+    }
     console.error(err);
     res.status(500).json({ result: false, error: HttpStatus.INTERNAL_SERVER_ERROR });
   }
