@@ -22,18 +22,7 @@ const profilSchema = new mongoose.Schema({
   jobTitle: { type: String, set: v => v.toLowerCase() },
   email: { type: String, trim: true, set: v => v.toLowerCase() },
   website: { type: String, trim: true, set: v => v.toLowerCase() },
-  phone: {
-    type: String,
-    trim: true,
-    validate: {
-      validator: function(v) {
-        const phoneNumber = parsePhoneNumberFromString(v, 'FR');
-        return phoneNumber ? phoneNumber.isValid() : false;
-      },
-      message: props => `${props.value} n'est pas un numéro de téléphone valide!`
-    },
-    required: [true, 'Le numéro de téléphone est requis']
-  },
+  phone: { type: String, trim: true},
   address: { type: String, set: v => v.toLowerCase() },
   city: { type: String, set: v => v.toLowerCase() },
   country: { type: String, trim: true, set: v => v.toLowerCase() },
