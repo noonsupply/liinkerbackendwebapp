@@ -169,7 +169,7 @@ router.put("/updateProfilPublic/:profilId", async (req, res) => {
 }
 );
 
-router.get("/displayPublicCards", async (req, res) => {
+/* router.get("/displayPublicCards", async (req, res) => {
   try {
     const profiles = await Profil.find({ isPublic: true });
     if (!profiles.length) {
@@ -182,14 +182,53 @@ router.get("/displayPublicCards", async (req, res) => {
     res.status(500).json({ result: false, error: HttpStatus.INTERNAL_SERVER_ERROR });
   }
 }
-);
+); */
+router.get("/displayPublicCards", async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const generalTag = req.query.generalTag;
+    const specificTags = req.query.specificTags ? req.query.specificTags.split(",") : [];
+
+    const skip = (page - 1) * limit;
+
+    let query = { isPublic: true };
+
+    if (generalTag) {
+      // Créer une expression régulière pour le tag général
+      const generalTagRegex = new RegExp(generalTag, 'i'); // 'i' pour la recherche insensible à la casse
+      query.tags = generalTagRegex;
+    }
+
+    if (specificTags.length > 0) {
+      // Créer des expressions régulières pour chaque tag spécifique
+      const specificTagsRegex = specificTags.map(tag => new RegExp(tag, 'i'));
+      query.tags = { $in: specificTagsRegex };
+    }
+
+    console.log('Query:', query); // Ajouter ce log pour le débogage
+
+    const profiles = await Profil.find(query).skip(skip).limit(limit);
+    if (!profiles.length) {
+      return res.status(400).json({ result: false, error: ErrorMessages.NOT_CARD_FOR_USER });
+    }
+
+    return res.json({ result: true, profiles });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ result: false, error: HttpStatus.INTERNAL_SERVER_ERROR });
+  }
+});
+
+
+
 
 router.get("/displayPublicCardsDetail/:profilId", async (req, res) => {
 
   const { profilId } = req.params;
 
   try {
-    const profile = await Profil.findById(profilId).populate("userId");
+    const profile = await Profil.findById(profilId);
     if (!profile) {
       return res.status(400).json({ result: false, error: ErrorMessages.NOT_CARD_FOR_USER });
     }
@@ -201,6 +240,53 @@ router.get("/displayPublicCardsDetail/:profilId", async (req, res) => {
   }
 }
 );
+
+router.get('/displayAllTags', async (req, res) => {
+  try {
+    // Récupération des profils où isPublic est true
+    const profiles = await Profil.find({ isPublic: true });
+
+    if (!profiles.length) {
+      return res.status(400).json({ result: false, error: ErrorMessages.NOT_CARD_FOR_USER });
+    }
+
+    // Extraction des tags uniques
+    const uniqueTags = new Set();
+    profiles.forEach(profile => {
+      profile.tags.forEach(tag => {
+        uniqueTags.add(tag);
+      });
+    });
+
+    // Convertir le Set en Array pour la réponse
+    const tagsArray = Array.from(uniqueTags);
+
+    return res.json({ result: true, tags: tagsArray });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ result: false, error: HttpStatus.INTERNAL_SERVER_ERROR });
+  }
+});
+
+router.get('/displayAllTags/tags', async (req, res) => {
+  try {
+    const query = req.query.query || '';
+    // Utiliser une expression régulière pour filtrer les tags
+    const regex = new RegExp(query, 'i'); // 'i' pour la recherche insensible à la casse
+
+    // Récupérer directement les tags distincts qui correspondent à la requête
+    const tags = await Profil.find({ isPublic: true, tags: { $regex: regex } }).distinct('tags');
+
+    if (!tags.length) {
+      return res.status(400).json({ result: false, error: "Aucun tag trouvé" });
+    }
+
+    return res.json({ result: true, tags: tags });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ result: false, error: "Erreur interne du serveur" });
+  }
+});
 
 
 
