@@ -38,7 +38,7 @@ const profilSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
   isDeleted: { type: Boolean, default: false },
-  isPublic: { type: Boolean, default: false },  
+  isPublic: { type: Boolean, default: true },  
   networkLinks: [profilNetworkLinkSchema],
   // trim supprime les espaces inutiles  avant et aprés la chaine de caractere
 });
