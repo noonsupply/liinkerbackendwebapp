@@ -30,6 +30,7 @@ const profilSchema = new mongoose.Schema({
   companyName : {type: String, trim: true, set: v => v.toLowerCase() },
   businessType: { type: String, trim: true, set: v => v.toLowerCase() },
   description: { type: String, set: v => v.toLowerCase(), required: true },
+  siret: { type: String, trim: true },
   tags: {
     type: [String],
     set: v => v.map(tag => tag.trim())
