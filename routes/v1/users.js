@@ -202,8 +202,8 @@ router.post("/welcomeEmail", async (req, res) => {
     const mailOptions = {
       from: process.env.USER_PASS,
       to: email,
-      subject: "Welcome to the application",
-      text: `Welcome to the application`,
+      subject: "Bienvenue sur Liinker",
+      text: `Bienvenue sur Liinker`,
       html: emailHtml,
     };
 
