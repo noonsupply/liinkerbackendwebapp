@@ -14,6 +14,9 @@ const RoomProfiles = require("../../models/v1/roomProfiles");
 const Rooms = require("../../models/v1/rooms");
 const Profil = require('../../models/v1/profils')
 const Role = require('../../models/v1/roles')
+const ejs = require('ejs');
+const path = require('path');
+
 
 /* GET users listing. */
 router.get("/", function (req, res, next) {
@@ -178,6 +181,51 @@ router.post("/forgetPassword", async (req, res) => {
   }
 });
 
+// welcome email
+router.post("/welcomeEmail", async (req, res) => {
+  const { email, userName } = req.body;
+
+  try {
+
+    const transporter = nodemailer.createTransport({
+      host: "smtp.ionos.fr",
+      port: 465, // Ou 465 selon votre configuration
+      secure: true, // true pour 465, false pour les autres ports
+      auth: {
+        user: process.env.USER_PASS,
+        pass: process.env.PASSWORD_USER_PASS,
+      },
+    });
+
+    const emailHtml = await ejs.renderFile(path.join(__dirname, '../../views/emails/welcome-email.ejs'), { name: userName });
+
+    const mailOptions = {
+      from: process.env.USER_PASS,
+      to: email,
+      subject: "Welcome to the application",
+      text: `Welcome to the application`,
+      html: emailHtml,
+    };
+
+    transporter.sendMail(mailOptions, (err, response) => {
+      if (err) {
+        console.error("Error sending email:", err);
+        return res
+          .status(500)
+          .json({ result: false, error: "Error sending email." });
+      } else {
+        return res
+          .status(200)
+          .json({ result: true, message: "Welcome email sent." });
+      }
+    });
+
+  }
+  catch (err) {
+    console.error("Error:", err);
+    return res.status(500).json({ result: false, error: err.message });
+  }
+});
 
 // update password user with this rte
 router.post("/changePassword", async (req, res) => {
