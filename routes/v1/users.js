@@ -183,7 +183,7 @@ router.post("/forgetPassword", async (req, res) => {
 
 // welcome email
 router.post("/welcomeEmail", async (req, res) => {
-  const { email, userName } = req.body;
+  const { email } = req.body;
 
   try {
 
@@ -197,7 +197,7 @@ router.post("/welcomeEmail", async (req, res) => {
       },
     });
 
-    const emailHtml = await ejs.renderFile(path.join(__dirname, '../../views/emails/welcome-email.ejs'), { name: userName });
+    const emailHtml = await ejs.renderFile(path.join(__dirname, '../../views/emails/welcome-email.ejs'));
 
     const mailOptions = {
       from: process.env.USER_PASS,
